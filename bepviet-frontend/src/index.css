@@ -1,0 +1,549 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+/* Container chính bao quanh toàn màn hình */
+.auth-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* --- Phần bên trái (Ảnh & Logo) --- */
+.auth-left {
+  flex: 1; /* Chiếm 50% hoặc tự co giãn */
+  background-image: url('/bg-auth.jpg'); /* Đảm bảo file ảnh nằm trong folder public */
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lớp phủ màu đen mờ lên ảnh để logo nổi hơn */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); 
+}
+
+.auth-logo {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.auth-logo img {
+  width: 150px; /* Chỉnh kích thước logo */
+  margin-bottom: 10px;
+}
+
+.auth-logo h2 {
+  color: #ff9f1c; /* Màu cam logo */
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.auth-logo p {
+  color: #fff;
+  font-size: 14px;
+}
+
+/* --- Phần bên phải (Form) --- */
+.auth-right {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.auth-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Style cho các ô nhập liệu */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fcfcfc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #ff9f1c;
+  background-color: #fff;
+}
+
+/* Style cho nút bấm */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: #f59e0b; /* Màu cam chuẩn */
+  color: white;
+  border: none;
+  border-radius: 30px; /* Bo tròn nhiều như thiết kế */
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  background-color: #d97706;
+}
+
+/* Footer form (Link đăng nhập/đăng ký) */
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+.auth-footer a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Nút Social (Google/Facebook) */
+.social-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.btn-social {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.nav-menu a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+.header-search input {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  width: 250px;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-post {
+  background: #f59e0b;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* --- Hero Banner --- */
+.hero-section {
+  background-image: url('/banner-home.jpg'); /* Nhớ có ảnh này trong public */
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+.hero-title {
+  font-size: 36px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+  margin-bottom: 20px;
+}
+.hero-search-bar {
+  background: white;
+  padding: 5px;
+  border-radius: 30px;
+  display: flex;
+  width: 500px;
+}
+.hero-search-bar input {
+  flex: 1;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  outline: none;
+}
+.hero-search-bar button {
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+/* --- Categories --- */
+.category-section {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 30px 0;
+}
+.cat-item {
+  text-align: center;
+  cursor: pointer;
+}
+.cat-icon {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 5px;
+  font-size: 24px;
+}
+
+/* --- Recipe Grid --- */
+.section-title {
+  padding: 0 50px;
+  margin-top: 30px;
+  border-left: 5px solid #f59e0b;
+  padding-left: 10px;
+  text-transform: uppercase;
+  color: #0f172a;
+}
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 cột */
+  gap: 20px;
+  padding: 20px 50px;
+}
+.recipe-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+.recipe-card:hover {
+  transform: translateY(-5px);
+}
+.recipe-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.recipe-info {
+  padding: 15px;
+}
+.recipe-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recipe-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+.recipe-author {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.author-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ddd;
+}
+/* --- Community Section (Cộng đồng) --- */
+.community-section {
+  display: flex;
+  gap: 30px;
+  padding: 20px 50px;
+  margin-bottom: 50px;
+}
+.comm-left {
+  flex: 2;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 350px;
+}
+.comm-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.comm-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  color: white;
+}
+.comm-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.comm-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+}
+.comm-card img {
+  width: 80px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* --- Footer --- */
+.footer {
+  background-color: #0f172a; /* Màu xanh đen đậm */
+  color: #94a3b8;
+  padding: 50px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 30px;
+  font-size: 14px;
+}
+.footer h3 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.footer ul {
+  list-style: none;
+}
+.footer ul li {
+  margin-bottom: 10px;
+}
+.footer-input {
+  display: flex;
+}
+.footer-input input {
+  padding: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  border-radius: 4px 0 0 4px;
+  flex: 1;
+}
+.footer-input button {
+  padding: 10px 20px;
+  background: #f59e0b;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+/* --- Recipe Detail Page --- */
+.detail-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.detail-hero-img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.detail-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+  color: #333;
+}
+
+.meta-bar {
+  display: flex;
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px 0;
+  justify-content: space-around;
+  font-weight: 500;
+  color: #555;
+}
+
+.detail-desc {
+  background: #fffbeb; /* Màu vàng nhạt giống ảnh */
+  padding: 20px;
+  border-left: 5px solid #f59e0b;
+  font-style: italic;
+  margin-bottom: 30px;
+  color: #444;
+}
+
+/* Layout 2 cột: Nguyên liệu - Cách làm */
+.detail-content {
+  display: flex;
+  gap: 40px;
+}
+
+/* Cột trái: Nguyên liệu */
+.ingredients-box {
+  flex: 1;
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 8px;
+  height: fit-content;
+  border: 1px solid #e5e7eb;
+}
+.ing-header {
+  font-weight: bold;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  color: #444;
+}
+.btn-add-cart {
+  width: 100%;
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+.ing-list div {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* Cột phải: Cách làm */
+.steps-box {
+  flex: 2;
+}
+.step-item {
+  margin-bottom: 30px;
+}
+.step-title {
+  font-weight: bold;
+  color: #f59e0b;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+.step-img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+/* Phần Bình luận */
+.review-section {
+  margin-top: 50px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  background-color: #e5e5e5; /* Màu xám nền phần comment */
+  padding: 20px;
+  border-radius: 8px;
+}
+.review-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}

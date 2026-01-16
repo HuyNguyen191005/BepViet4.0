@@ -1,18 +1,14 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import { Routes, Route } from 'react-router-dom';
+import RecipeSearch from './pages/RecipeSearch'; // Import trang kết quả
 import Home from './pages/Home';
-import RecipeDetail from './pages/RecipeDetail';
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/recipes/:id" element={<RecipeDetail />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+       <Route path="/" element={<Home />} />
+       {/* Định nghĩa đường dẫn nhận tham số search */}
+       <Route path="/search" element={<RecipeSearch />} />
+    </Routes>
   );
 }
 

@@ -89,12 +89,12 @@ const Home = () => {
             {/* 3. DANH MỤC */}
             <div className="category-section">
                 <div className="cat-item"><div className="cat-icon" style={{color:'#eab308'}}>☕</div><span>Sáng</span></div>
-                <div className="cat-item"><div className="cat-icon" style={{color:'#22c55e'}}>🥗</div><span>Chay</span></div>
+                <div className="cat-item"><div className="cat-icon" style={{color:'#22c55e'}}>🥗</div><Link to="/Categories-Collections">Chay</Link></div>
                 <div className="cat-item"><div className="cat-icon" style={{color:'#ef4444'}}>🍲</div><span>Lẩu</span></div>
                 <div className="cat-item"><div className="cat-icon" style={{color:'#f97316'}}>🍰</div><span>Bánh</span></div>
                 <div className="cat-item"><div className="cat-icon" style={{color:'#3b82f6'}}>🍹</div><span>Đồ uống</span></div>
             </div>
-
+            
             {/* 4. MÓN NGON NỔI BẬT (GRID) */}
             <div style={{maxWidth: '1200px', margin: '0 auto'}}>
                 <h2 className="section-title">MÓN NGON NỔI BẬT</h2>

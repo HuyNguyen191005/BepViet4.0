@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
+
 import Havebreakfast from './pages/HaveBreakfastPage';
 import CakePage from './pages/CakePage';
 import BeveragePage from './pages/BeveragePage';
@@ -12,6 +13,10 @@ import VegetarianPage from './pages/VegetarianPage';
 // THÊM CÁC DÒNG IMPORT NÀY (Đảm bảo đúng đường dẫn file của bạn)
 // import DefaultLayout from './components/DefaultLayout'; 
 // import SearchResults from './pages/SearchResults'; 
+
+import SearchResults from './pages/SearchResults'; // Import trang tìm kiếm (đường dẫn tùy nơi bạn lưu)
+import DefaultLayout from './components/DefaultLayout'; // Import Layout vừa tạo
+
 
 function App() {
   return (
@@ -28,9 +33,19 @@ function App() {
         <Route path="/mon-lau" element={<HotPotPage />} />
 
         {/* Các trang không có Header */}
+
+        {/* --- NHÓM 1: CÁC TRANG CÓ HEADER (Dùng DefaultLayout) --- */}
+        <Route element={<DefaultLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+            <Route path="/search" element={<SearchResults />} /> {/* Thêm route tìm kiếm */}
+        </Route>
+
+        {/* --- NHÓM 2: CÁC TRANG KHÔNG CÓ HEADER (Đứng độc lập) --- */}
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/recipes/:id" element={<RecipeDetail />} />
+        
       </Routes>
     </BrowserRouter>
   );

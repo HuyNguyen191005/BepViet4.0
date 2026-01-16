@@ -37,7 +37,7 @@ const Home = () => {
     return (
         <div className="home-page">
             {/* 1. HEADER */}
-            <header className="header">
+            {/* <header className="header">
                 <div style={{display:'flex', alignItems:'center'}}>
                     <img src="/logo.png" alt="Logo" style={{height:'45px', marginRight:'10px'}} />
                     <div>
@@ -72,7 +72,7 @@ const Home = () => {
                         <Link to="/login" className="btn-post">Đăng nhập</Link>
                     )}
                 </div>
-            </header>
+            </header> */}
 
             {/* 2. HERO BANNER */}
             <div className="hero-section">
@@ -107,8 +107,8 @@ const Home = () => {
                     <div className="cat-icon" style={{color:'#3b82f6'}}>🍹</div>
                     <span>Bánh</span>
                 </Link>
-               
-            </div>
+               </div>
+
 
             {/* 4. MÓN NGON NỔI BẬT (GRID) */}
             <div style={{maxWidth: '1200px', margin: '0 auto'}}>

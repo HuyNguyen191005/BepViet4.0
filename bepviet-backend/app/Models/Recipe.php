@@ -49,11 +49,20 @@ class Recipe extends Model
     {
         return $this->hasMany(Review::class, 'recipe_id', 'recipe_id')->orderBy('created_at', 'desc');
     }
+<<<<<<< HEAD
     public function categories() {
         return $this->belongsToMany(Category::class, 'recipe_categories', 'recipe_id', 'category_id');
     }
 
 
+=======
+    // Liên kết n-n với Categories
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'recipe_categories', 'recipe_id', 'category_id');
+    }
+
+>>>>>>> 2acc1d928f96f794e1c4f5ecba4ecabdc5759f7d
     // Liên kết 1-n với Reviews
     // public function reviews()
     // {

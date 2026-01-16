@@ -49,4 +49,24 @@ class Recipe extends Model
     {
         return $this->hasMany(Review::class, 'recipe_id', 'recipe_id')->orderBy('created_at', 'desc');
     }
+    // // Thêm dòng này để Laravel luôn đính kèm link ảnh đầy đủ khi trả về JSON
+    // protected $appends = ['full_image_path'];
+
+    // // Hàm này sẽ tự động tạo ra link ảnh đầy đủ
+    // public function getFullImagePathAttribute()
+    // {
+    //     // Nếu trong DB chưa có ảnh, trả về ảnh mặc định (bạn có thể thay link khác)
+    //     if (!$this->image_url) {
+    //         return 'https://via.placeholder.com/640x480.png/00cc77?text=No+Image';
+    //     }
+
+    //     // Nếu link đã có http rồi (ảnh lấy trên mạng) thì giữ nguyên
+    //     if (str_starts_with($this->image_url, 'http')) {
+    //         return $this->image_url;
+    //     }
+
+    //     // Trả về link đầy đủ từ server của bạn
+    //     // Ví dụ: http://localhost:8000/storage/logo.png
+    //     return asset('storage/' . $this->image_url);
+    // }
 }

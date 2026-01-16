@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 import { Routes, Route } from 'react-router-dom'; // Chỉ import Routes và Route
 
@@ -26,6 +27,19 @@ function App() {
         <Route path="/profile" element={<UserDashboard />} />
       </Routes>
     </div>
+=======
+import { Routes, Route } from 'react-router-dom';
+import RecipeSearch from './pages/RecipeSearch'; // Import trang kết quả
+import Home from './pages/Home';
+
+function App() {
+  return (
+    <Routes>
+       <Route path="/" element={<Home />} />
+       {/* Định nghĩa đường dẫn nhận tham số search */}
+       <Route path="/search" element={<RecipeSearch />} />
+    </Routes>
+>>>>>>> 1bc382cc3bad90121b281a216397ac55b30f6c9e
   );
 }
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Recipe;
-
+use App\Models\Category;
 class RecipeController extends Controller
 {
 public function index()
@@ -32,6 +32,20 @@ public function show($id)
             return response()->json(['message' => 'Không tìm thấy món ăn'], 404);
         }
 
-        return response()->json($recipe);
+        return response()->json($recipe);   
+    }
+    public function getByCategory($id)
+    {
+        $category = Category::findOrFail($id);
+    
+        // Thay ->get() bằng ->paginate(8)
+        $recipes = Recipe::whereHas('categories', function($query) use ($id) {
+            $query->where('categories.category_id', $id);
+        })->with('author')->paginate(9); 
+    
+        return response()->json([
+            'category' => $category,
+            'recipes' => $recipes 
+        ]);
     }
 }

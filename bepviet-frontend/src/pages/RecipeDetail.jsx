@@ -36,7 +36,14 @@ const RecipeDetail = () => {
 
             <div className="detail-container">
                 {/* HEADER INFO */}
-                <span style={{fontSize:'13px', color:'#888'}}>Trang chủ / Công thức / <b>{recipe.title}</b></span>
+                <span style={{fontSize:'13px', color:'#888'}}>
+                    <Link to="/" style={{color:'#888', textDecoration:'none'}}>Trang chủ</Link> 
+                    {' / '}
+                    {/* Giả sử đường dẫn trang món chay là /mon-chay */}
+                    <Link to="/mon-chay" style={{color:'#888', textDecoration:'none'}}>Món Chay</Link> 
+                    {' / '}
+                    <b>{recipe.title}</b>
+                </span>
                 
                 <img src={mainImage} alt={recipe.title} className="detail-hero-img" style={{marginTop:'15px'}} />
                 

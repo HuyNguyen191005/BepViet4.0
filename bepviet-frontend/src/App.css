@@ -41,3 +41,58 @@
   color: #888;
 }
 
+/* Vòng tròn bao quanh icon - Mặc định */
+/* Vòng tròn bao quanh icon (Placeholder) */
+.cat-icon {
+  width: 65px !important;
+  height: 65px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: 28px !important;
+  transition: all 0.3s ease !important;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* --- MÀU SẮC CHUẨN THEO ICON --- */
+
+/* 1. Món Sáng - Màu Cam */
+.cat-item.sang .cat-icon { 
+  background-color: #fef3c7 !important; /* Nền cam nhạt */
+  color: #f59e0b !important;            /* Icon cam đậm */
+}
+
+/* 2. Món Chay - Màu Xanh Lá */
+.cat-item.chay .cat-icon { 
+  background-color: #dcfce7 !important; /* Nền xanh nhạt */
+  color: #22c55e !important;            /* Icon xanh đậm */
+}
+
+/* 3. Món Lẩu - Màu Đỏ */
+.cat-item.lau .cat-icon { 
+  background-color: #fee2e2 !important; /* Nền đỏ nhạt */
+  color: #ef4444 !important;            /* Icon đỏ đậm */
+}
+
+/* 4. Món Bánh - Màu Vàng */
+.cat-item.banh .cat-icon { 
+  background-color: #fef9c3 !important; /* Nền vàng nhạt */
+  color: #fbbf24 !important;            /* Icon vàng đậm */
+}
+
+/* 5. Đồ uống - Màu Xanh Dương */
+.cat-item.douong .cat-icon { 
+  background-color: #dbeafe !important; /* Nền xanh dương nhạt */
+  color: #3b82f6 !important;            /* Icon xanh dương đậm */
+}
+
+/* Hiệu ứng nảy lên khi di chuột vào */
+.cat-item:hover {
+  transform: translateY(-5px);
+}
+.cat-item:hover .cat-icon {
+  transform: scale(1.05);
+  filter: brightness(0.95);
+}

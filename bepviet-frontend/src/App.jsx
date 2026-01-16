@@ -1,45 +1,29 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Chỉ import Routes và Route
-
-// Import các trang của bạn
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
-import UserDashboard from './pages/UserDashboard';
+import SearchResults from './pages/SearchResults'; // Import trang tìm kiếm (đường dẫn tùy nơi bạn lưu)
+import DefaultLayout from './components/DefaultLayout'; // Import Layout vừa tạo
 
 function App() {
   return (
-    <div className="App">
+    <BrowserRouter>
       <Routes>
-        {/* Đường dẫn trang chủ */}
-        <Route path="/" element={<Home />} />
         
-        {/* Đường dẫn đăng nhập/đăng ký */}
+        {/* --- NHÓM 1: CÁC TRANG CÓ HEADER (Dùng DefaultLayout) --- */}
+        <Route element={<DefaultLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+            <Route path="/search" element={<SearchResults />} /> {/* Thêm route tìm kiếm */}
+        </Route>
+
+        {/* --- NHÓM 2: CÁC TRANG KHÔNG CÓ HEADER (Đứng độc lập) --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Đường dẫn chi tiết công thức */}
-        <Route path="/recipes/:id" element={<RecipeDetail />} />
-        
-        {/* Đường dẫn Dashboard người dùng (Mới thêm) */}
-        <Route path="/profile" element={<UserDashboard />} />
       </Routes>
-    </div>
-=======
-import { Routes, Route } from 'react-router-dom';
-import RecipeSearch from './pages/RecipeSearch'; // Import trang kết quả
-import Home from './pages/Home';
-
-function App() {
-  return (
-    <Routes>
-       <Route path="/" element={<Home />} />
-       {/* Định nghĩa đường dẫn nhận tham số search */}
-       <Route path="/search" element={<RecipeSearch />} />
-    </Routes>
->>>>>>> 1bc382cc3bad90121b281a216397ac55b30f6c9e
+    </BrowserRouter>
   );
 }
 

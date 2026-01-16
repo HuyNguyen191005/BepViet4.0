@@ -52,4 +52,18 @@ class Recipe extends Model
     public function categories() {
         return $this->belongsToMany(Category::class, 'recipe_categories', 'recipe_id', 'category_id');
     }
+
+
+    // Liên kết 1-n với Reviews
+    // public function reviews()
+    // {
+    //     return $this->hasMany(Review::class, 'recipe_id', 'recipe_id');
+    // }
+
+    // Accessor để lấy đường dẫn ảnh đầy đủ (tùy chọn)
+    public function getFullImagePathAttribute()
+    {
+        // Giả sử ảnh lưu trong public/images
+        return asset('images/' . $this->image_url);
+    }
 }

@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
 import axiosClient from '../api/axiosClient';
-import '../App.css';
-
 const Home = () => {
     const [recipes, setRecipes] = useState([]);
     const [user, setUser] = useState(null);
@@ -111,7 +109,7 @@ const Home = () => {
                 </Link>
                
             </div>
-            
+
             {/* 4. MÓN NGON NỔI BẬT (GRID) */}
             <div style={{maxWidth: '1200px', margin: '0 auto'}}>
                 <h2 className="section-title">MÓN NGON NỔI BẬT</h2>

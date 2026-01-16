@@ -20,8 +20,10 @@ use App\Http\Controllers\RecipeController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/recipes', [RecipeController::class, 'index']); // Lấy danh sách
+Route::get('/recipes/search', [RecipeController::class, 'search']);
+Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
+
 // Route cần đăng nhập mới vào được (Test token)
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
-    

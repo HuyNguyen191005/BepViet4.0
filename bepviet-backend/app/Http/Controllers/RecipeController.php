@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
@@ -47,5 +47,52 @@ public function show($id)
             'category' => $category,
             'recipes' => $recipes 
         ]);
+    }
+   public function search(Request $request)
+{
+    $query = Recipe::query();
+
+    // 1. Tìm theo từ khóa
+    if ($request->filled('query')) {
+        $keyword = $request->input('query');
+        $query->where('title', 'like', '%' . $keyword . '%');
+    }
+
+    // 2. Lọc Category (CHỈ LỌC KHI CÓ DỮ LIỆU)
+    if ($request->filled('categories')) {
+        $categoryIds = explode(',', $request->input('categories'));
+        // Kiểm tra xem mảng có rỗng không trước khi lọc
+        if (!empty($categoryIds) && $categoryIds[0] != "") {
+            $query->whereHas('categories', function ($q) use ($categoryIds) {
+                $q->whereIn('categories.category_id', $categoryIds);
+            });
+        }
+    }
+
+    // 3. Lọc Độ khó (CHỈ LỌC KHI CÓ DỮ LIỆU)
+    if ($request->filled('difficulty')) {
+        $difficulties = explode(',', $request->input('difficulty'));
+        if (!empty($difficulties) && $difficulties[0] != "") {
+            $query->whereIn('difficulty', $difficulties);
+        }
+    }
+
+    // 4. Lọc Thời gian
+    if ($request->filled('max_time')) {
+        $query->where('cooking_time', '<=', $request->input('max_time'));
+    }
+
+    // 5. Lấy kèm dữ liệu liên quan
+    $recipes = $query->with('categories')
+                     ->withAvg('reviews', 'rating')
+                     ->withCount('reviews')
+                     ->get();
+
+    return response()->json($recipes);
+    }
+
+// Đảm bảo bạn CÓ hàm này để lấy danh sách Loại món
+    public function getCategories() {
+        return response()->json(\App\Models\Category::all());
     }
 }

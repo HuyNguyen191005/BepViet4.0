@@ -8,8 +8,60 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    // 1. ĐĂNG KÝ
+    public function register(Request $request)
+    {
+        // Validate dữ liệu đầu vào với luật tùy chỉnh
+        $fields = $request->validate([
+            'username' => [
+                'required',
+                'string',
+                'unique:users,username',
+               
+            ],
+           'full_name' => [
+            'required',
+            'string',
+            'regex:/^[^0-9]+$/' // Luật: Chuỗi không được chứa số
+        ],
+            'email' => 'required|string|email|unique:users,email',
+            'password' => [
+                'required',
+                'string',
+                'confirmed', // Bắt buộc Frontend phải gửi kèm field 'password_confirmation'
+                'min:6',     // 👈 Luật: Tối thiểu 6 ký tự
+                'regex:/[A-Z]/' // 👈 Luật: Phải chứa ít nhất 1 chữ hoa
+            ],
+        ], [
+            // Tùy chỉnh thông báo lỗi tiếng Việt trả về cho Frontend
+            'full_name.regex' => 'Họ và tên không được chứa số.',
+            'username.unique' => 'Tên đăng nhập này đã tồn tại.',
+            'email.unique' => 'Email này đã được sử dụng.',
+            'password.confirmed' => 'Mật khẩu nhập lại không khớp.',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'password.regex' => 'Mật khẩu phải chứa ít nhất 1 chữ cái in hoa.',
+        ]);
+
+        // Tạo user mới
+        $user = User::create([
+            'username' => $fields['username'],
+            'full_name' => $fields['full_name'],
+            'email' => $fields['email'],
+            // Lưu ý: Cột trong DB bạn là password_hash nên phải gán đúng tên
+            'password_hash' => Hash::make($fields['password']), 
+            'role' => 'User', 
+        ]);
+
+        // 👇 THAY ĐỔI: Không tạo token nữa.
+        // Chỉ trả về thông báo thành công để Frontend chuyển trang Login.
+        return response()->json([
+            'message' => 'Đăng ký thành công! Vui lòng đăng nhập.',
+            'user' => $user
+        ], 201);
+    }
+
+    // 2. ĐĂNG NHẬP
     public function login(Request $request) {
-        // Validate dữ liệu gửi lên
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -18,7 +70,8 @@ class AuthController extends Controller
         // Tìm user theo email
         $user = User::where('email', $request->email)->first();
 
-        // Kiểm tra password (dùng Hash::check để so sánh với password_hash)
+        // Kiểm tra password
+        // Lưu ý: So sánh password gửi lên với cột 'password_hash' trong DB
         if (!$user || !Hash::check($request->password, $user->password_hash)) {
             return response()->json([
                 'message' => 'Tài khoản hoặc mật khẩu không đúng!'
@@ -34,36 +87,8 @@ class AuthController extends Controller
             'user' => $user
         ], 200);
     }
-    public function register(Request $request)
-    {
-        // 1. Validate dữ liệu đầu vào
-        $fields = $request->validate([
-            'username' => 'required|string|unique:users,username', // Username không được trùng
-            'full_name' => 'required|string',
-            'email' => 'required|string|email|unique:users,email', // Email không được trùng
-            'password' => 'required|string|confirmed|min:6', // 'confirmed' bắt buộc frontend phải gửi thêm password_confirmation
-        ]);
 
-        // 2. Tạo user mới
-        $user = User::create([
-            'username' => $fields['username'],
-            'full_name' => $fields['full_name'],
-            'email' => $fields['email'],
-            'password_hash' => Hash::make($fields['password']), // Mã hóa password lưu vào cột password_hash
-            'role' => 'User', // Mặc định là User thường
-        ]);
-
-        // 3. Tạo token ngay lập tức (để đăng ký xong là đăng nhập luôn)
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        // 4. Trả về kết quả
-        return response()->json([
-            'user' => $user,
-            'access_token' => $token,
-            'message' => 'Đăng ký tài khoản thành công!'
-        ], 201);
-    }
-    // API lấy thông tin user hiện tại (để test token)
+    // API lấy thông tin user hiện tại (để test)
     public function me(Request $request) {
         return $request->user();
     }

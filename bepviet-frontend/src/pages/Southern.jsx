@@ -41,44 +41,6 @@ const VegetarianPage = () => {
 
     return (
         <div className="home-page">
-            
-            {/* 1. HEADER (Copy từ Home.jsx) */}
-            <header className="header">
-                <div style={{display:'flex', alignItems:'center'}}>
-                    <img src="/logo.png" alt="Logo" style={{height:'45px', marginRight:'10px'}} />
-                    <div>
-                        <h2 style={{color:'#f59e0b', fontSize:'22px', fontWeight:'800'}}>BẾP VIỆT 4.0</h2>
-                        <span style={{fontSize:'12px', color:'#666', letterSpacing:'1px'}}>TINH HOA ẨM THỰC VIỆT</span>
-                    </div>
-                </div>
-                
-                <nav className="nav-menu">
-                    <Link to="/">Trang chủ</Link>
-                    <Link to="/recipes">Công thức</Link>
-                    <Link to="/community">Cộng đồng</Link>
-                    <Link to="/blog">Blog</Link>
-                </nav>
-
-                <div className="header-search">
-                    <input type="text" placeholder="🔍 Tìm nhanh công thức..." />
-                </div>
-
-                <div className="user-info">
-                    {user ? (
-                        <>
-                            <img src={user.avatar || '/default-avatar.png'} style={{width:'35px', height:'35px', borderRadius:'50%'}} alt="" />
-                            <div style={{fontSize:'13px'}}>
-                                <div>Xin chào,</div>
-                                <b>{user.full_name}</b>
-                            </div>
-                            <button onClick={handleLogout} style={{marginLeft:'10px', fontSize:'12px', color:'#666', background:'none', border:'none', cursor:'pointer'}}>(Thoát)</button>
-                            <Link to="/create-recipe" className="btn-post" style={{marginLeft:'10px'}}>+ Đăng bài</Link>
-                        </>
-                    ) : (
-                        <Link to="/login" className="btn-post">Đăng nhập</Link>
-                    )}
-                </div>
-            </header>
 
             {/* 2. BANNER */}
             <div className="hero-section" style={{background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/vegetable-bg.jpg")', backgroundColor: '#ef4444'}}>

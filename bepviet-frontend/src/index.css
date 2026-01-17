@@ -170,39 +170,177 @@ body {
   justify-content: center;
   gap: 5px;
 }
-/* --- Header --- */
-.header {
+/* =========================================
+   CSS CHO HEADER MỚI (Khớp với Header.jsx)
+   ========================================= */
+
+/* Khung bao ngoài header */
+.header-container {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Tạo bóng mờ */
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Luôn nổi lên trên */
+  width: 100%;
+}
+
+/* Căn chỉnh nội dung bên trong */
+.header-wrapper {
+  max-width: 1200px; /* Giới hạn chiều rộng để đẹp trên màn hình lớn */
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 70px; /* Chiều cao cố định */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 50px;
-  background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-.nav-menu a {
-  margin: 0 15px;
+
+/* --- 1. LOGO --- */
+.logo-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  color: #333;
-  font-weight: 500;
+  gap: 10px;
 }
-.header-search input {
+.logo-img {
+  height: 45px;
+  width: auto;
+}
+.brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a; /* Màu chữ đậm */
+}
+.brand-version {
+  background: #f59e0b; /* Màu cam */
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+}
+
+/* --- 2. MENU GIỮA --- */
+.header-center {
+  display: flex;
+  gap: 30px;
+}
+.nav-item {
+  text-decoration: none;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+.nav-item:hover, .nav-item.active {
+  color: #f59e0b; /* Hover màu cam */
+}
+
+/* --- 3. KHU VỰC PHẢI (SEARCH & USER) --- */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Ô tìm kiếm */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
   padding: 8px 15px;
-  border-radius: 20px;
-  border: 1px solid #ddd;
-  width: 250px;
+  border-radius: 25px;
+  border: 1px solid transparent;
 }
-.user-info {
+.search-box:focus-within {
+  border-color: #f59e0b; /* Viền cam khi click vào */
+  background: white;
+}
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 8px;
+  font-size: 14px;
+  width: 180px;
+}
+
+/* Nút Đăng bài */
+.btn-upload {
+  background-color: #f59e0b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.btn-upload:hover {
+  background-color: #d97706;
+  transform: scale(1.05);
+}
+
+/* User Profile */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.user-profile {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  position: relative;
 }
-.btn-post {
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+}
+.user-dropdown {
+  display: flex;
+  flex-direction: column;
+}
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+.logout-text {
+  font-size: 12px;
+  color: #ef4444; /* Màu đỏ cho nút đăng xuất */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.logout-text:hover {
+  text-decoration: underline;
+}
+
+/* Nút Đăng nhập / Đăng ký */
+.auth-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.btn-login-text {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+}
+.btn-register-orange {
+  text-decoration: none;
   background: #f59e0b;
   color: white;
-  padding: 8px 15px;
+  padding: 8px 20px;
   border-radius: 20px;
-  text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 /* --- Hero Banner --- */
@@ -245,7 +383,6 @@ body {
   border-radius: 25px;
   cursor: pointer;
 }
-
 /* --- Categories --- */
 .category-section {
   display: flex;
@@ -682,6 +819,278 @@ body {
   background-color: #3b82f6;
   color: white !important;
   box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+.author-name {
+    font-weight: 500;
+}
+
+/* --- SEARCH PAGE LAYOUT --- */
+.search-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9faff; /* Màu nền xanh rất nhạt */
+}
+
+.breadcrumb {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.current-crumb {
+    font-weight: bold;
+    color: #333;
+}
+
+.search-layout {
+    display: flex;
+    gap: 30px;
+}
+
+/* --- SIDEBAR FILTERS --- */
+.filter-sidebar {
+    width: 250px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    height: fit-content;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.filter-header h3 {
+    font-size: 18px;
+    color: #003399;
+    margin: 0;
+}
+.btn-clear-filter {
+    color: #ff4d4f;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.filter-group {
+    margin-bottom: 25px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+.filter-group h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #003399;
+}
+
+.checkbox-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+.checkbox-row input {
+    margin-right: 10px;
+    accent-color: #ff9f00; /* Màu cam checkbox */
+}
+.count-badge {
+    background: #eee;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Slider Range (CSS cơ bản) */
+.range-slider {
+    width: 100%;
+    accent-color: #ff9f00;
+}
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+.highlight-text {
+    color: #ff9f00;
+    font-weight: bold;
+}
+
+/* --- MAIN RESULTS CONTENT --- */
+.results-content {
+    flex: 1;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+}
+.results-title {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.result-count-badge {
+    background-color: #fff7e6; /* Màu vàng nhạt nền badge */
+    color: #d48806;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.sort-box select {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-left: 5px;
+    outline: none;
+}
+
+/* --- GRID & CARD STYLES --- */
+.recipe-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.recipe-card-modern {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    border: 1px solid #f0f0f0;
+}
+.recipe-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Image Area */
+.card-image-wrapper {
+    position: relative;
+    height: 180px;
+}
+.card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.heart-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    color: #888;
+}
+.time-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+/* Card Body */
+.card-body {
+    padding: 15px;
+}
+.card-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #003399; /* Màu chữ tiêu đề xanh đậm */
+    margin-bottom: 8px;
+    display: block;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.rating {
+    font-size: 13px;
+    color: #ffc107; /* Màu vàng sao */
+}
+.score {
+    font-weight: bold;
+    color: #333;
+    margin: 0 3px;
+}
+.review-count {
+    color: #999;
+}
+
+/* Difficulty Badges */
+.difficulty-pill {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+.green-badge {
+    background-color: #e6f7ff;
+    color: #00a854; /* Màu xanh lá cho Dễ */
+}
+.yellow-badge {
+    background-color: #fffbe6;
+    color: #faad14;
+}
+.red-badge {
+    background-color: #fff1f0;
+    color: #f5222d;
+}
+
+/* Card Footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.author-avatar {
+    border-radius: 50%;
 }
 .author-name {
     font-weight: 500;

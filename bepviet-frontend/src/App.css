@@ -1,42 +1,54 @@
+/* --- Thiết lập cho container chính (thường là thẻ div bao quanh ứng dụng) --- */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: 1280px; /* Giới hạn chiều rộng tối đa của nội dung */
+  margin: 0 auto;    /* Căn giữa container theo chiều ngang */
+  padding: 2rem;     /* Tạo khoảng cách đệm bên trong là 2rem */
+  text-align: center; /* Căn giữa văn bản bên trong */
 }
 
+/* --- Style chung cho các logo --- */
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  height: 6em;       /* Chiều cao cố định */
+  padding: 1.5em;    /* Khoảng cách đệm xung quanh logo */
+  will-change: filter; /* Gợi ý cho trình duyệt tối ưu hóa hiệu năng render cho thuộc tính filter */
+  transition: filter 300ms; /* Tạo hiệu ứng mượt mà (300ms) khi thuộc tính filter thay đổi */
 }
 
+/* --- Hiệu ứng khi di chuột (hover) vào logo chung --- */
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa); /* Tạo bóng đổ màu tím nhạt */
+}
+
+/* --- Hiệu ứng riêng khi di chuột vào logo React --- */
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa); /* Tạo bóng đổ màu xanh dương đặc trưng của React */
+}
+
+/* --- Định nghĩa hoạt ảnh (animation) xoay tròn --- */
 @keyframes logo-spin {
   from {
-    transform: rotate(0deg);
+    transform: rotate(0deg);   /* Bắt đầu từ 0 độ */
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(360deg); /* Kết thúc tại 360 độ (1 vòng) */
   }
 }
 
+/* --- Media Query: Kiểm tra cài đặt chuyển động của người dùng --- */
+/* Chỉ chạy animation nếu người dùng KHÔNG bật chế độ "Giảm chuyển động" trong hệ điều hành */
 @media (prefers-reduced-motion: no-preference) {
+  /* Chọn logo nằm trong thẻ <a> thứ 2 (thường là logo React trong template Vite) */
   a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+    animation: logo-spin infinite 20s linear; /* Xoay vô hạn, 20s/vòng, tốc độ đều */
   }
 }
 
+/* --- Style cho class card --- */
 .card {
-  padding: 2em;
+  padding: 2em; /* Tạo khoảng đệm xung quanh nội dung card */
 }
 
+/* --- Style cho dòng chữ hướng dẫn đọc tài liệu --- */
 .read-the-docs {
-  color: #888;
+  color: #888; /* Đặt màu chữ là xám */
 }

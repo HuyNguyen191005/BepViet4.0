@@ -14,7 +14,9 @@ import North from './pages/North';
 import SearchResults from './pages/SearchResults';
 import DefaultLayout from './components/DefaultLayout';
 import CreateRecipe from './pages/CreateRecipe';
-
+import Blog from './pages/Blog';
+import PostDetail from './pages/PostDetail'; 
+import CreatePost from './pages/CreatePost';
 function App() {
   return (
     <BrowserRouter>
@@ -42,7 +44,9 @@ function App() {
             <Route path="/mon-chinh" element={<Maincourse />} />
             <Route path="/mien-nam" element={<Southern />} />
             <Route path="/mien-bac" element={<North />} />
-            
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<PostDetail />} />
+            <Route path="/create-post" element={<CreatePost />} />
         </Route>
 
       </Routes>

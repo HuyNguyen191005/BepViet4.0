@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
 import axiosClient from '../api/axiosClient';
-
 const Home = () => {
     const [recipes, setRecipes] = useState([]);
     const [user, setUser] = useState(null);
@@ -38,7 +37,7 @@ const Home = () => {
     return (
         <div className="home-page">
             {/* 1. HEADER */}
-            {/* <header className="header">
+            <header className="header">
                 <div style={{display:'flex', alignItems:'center'}}>
                     <img src="/logo.png" alt="Logo" style={{height:'45px', marginRight:'10px'}} />
                     <div>
@@ -73,7 +72,7 @@ const Home = () => {
                         <Link to="/login" className="btn-post">Đăng nhập</Link>
                     )}
                 </div>
-            </header> */}
+            </header>
 
             {/* 2. HERO BANNER */}
             <div className="hero-section">
@@ -88,12 +87,37 @@ const Home = () => {
 
             {/* 3. DANH MỤC */}
             <div className="category-section">
-                <div className="cat-item"><div className="cat-icon" style={{color:'#eab308'}}>☕</div><span>Sáng</span></div>
-                <div className="cat-item"><div className="cat-icon" style={{color:'#22c55e'}}>🥗</div><span>Chay</span></div>
-                <div className="cat-item"><div className="cat-icon" style={{color:'#ef4444'}}>🍲</div><span>Lẩu</span></div>
-                <div className="cat-item"><div className="cat-icon" style={{color:'#f97316'}}>🍰</div><span>Bánh</span></div>
-                <div className="cat-item"><div className="cat-icon" style={{color:'#3b82f6'}}>🍹</div><span>Đồ uống</span></div>
-            </div>
+  {/* Sáng: Thay ☕ thành 🍳 (Trứng ốp la) hoặc 🥣 (Bát phở/cháo) sẽ đúng chất ăn sáng hơn */}
+  <Link to="/an-sang" className="cat-item" style={{textDecoration: 'none', color:'inherit'}}>
+    <div className="cat-icon" style={{color:'#22c55e'}}>🍳</div>
+    <span>Sáng</span>
+  </Link>
+
+  {/* Món chính: Thay 🥗 thành 🍛 (Cơm cà ri/thức ăn) hoặc 🍱 (Khay cơm) */}
+  <Link to="/mon-chinh" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="cat-icon" style={{color:'#22c55e'}}>🍛</div>
+    <span>Món chính</span>
+  </Link>
+
+  {/* Tráng miệng: Thay 🍲 thành 🍰 (Bánh ngọt) hoặc 🍮 (Caramen) */}
+  <Link to="/trang-mieng" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="cat-icon" style={{color:'#ef4444'}}>🍰</div>
+    <span>Tráng miệng</span>
+  </Link>
+
+  {/* Miền Bắc: Thay 🍰 thành 🍜 (Bát mì/phở - đặc trưng văn hóa ẩm thực Bắc) */}
+  <Link to="/mien-bac" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="cat-icon" style={{color:'#f97316'}}>🍜</div>
+    <span>Miền Bắc</span>
+  </Link>
+
+  {/* Miền Nam: Thay 🍹 thành 🥥 (Quả dừa) hoặc 🥘 (Món kho/lẩu miền Nam) */}
+  <Link to="/mien-nam" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="cat-icon" style={{color:'#3b82f6'}}>🥥</div>
+    <span>Miền Nam</span>
+  </Link>
+</div>
+
 
             {/* 4. MÓN NGON NỔI BẬT (GRID) */}
             <div style={{maxWidth: '1200px', margin: '0 auto'}}>

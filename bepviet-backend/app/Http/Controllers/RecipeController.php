@@ -10,18 +10,18 @@ use Illuminate\Support\Facades\Validator;
 
 class RecipeController extends Controller
 {
-public function index()
-{
-    // Lấy các món có status là 'Published', mới nhất lên đầu
-    $recipes = Recipe::with('author')
-                    ->where('status', 'Published') 
-                    ->orderBy('created_at', 'desc')
-                    ->take(8)
-                    ->get();
-    
-    return response()->json($recipes);
-}
-public function show($id)
+    public function index()
+    {
+        // Lấy các món có status là 'Published', mới nhất lên đầu
+        $recipes = Recipe::with('author')
+                        ->where('status', 'Published') 
+                        ->orderBy('created_at', 'desc')
+                        ->take(8)
+                        ->get();
+        
+        return response()->json($recipes);
+    }
+    public function show($id)
     {
         // Eager Load: Lấy Recipe kèm theo:
         // 1. author: Tác giả món ăn
@@ -35,10 +35,29 @@ public function show($id)
             return response()->json(['message' => 'Không tìm thấy món ăn'], 404);
         }
 
-        return response()->json($recipe);
+        return response()->json($recipe);   
     }
-   public function search(Request $request)
+    public function getByCategory($id)
 {
+    // Kiểm tra Category có tồn tại không
+    $category = Category::findOrFail($id);
+
+    $recipes = Recipe::where('status', 'Published') // Thêm lọc trạng thái
+        ->whereHas('categories', function($query) use ($id) {
+            // Sử dụng tên bảng pivot hoặc quan hệ chuẩn
+            $query->where('categories.category_id', $id);
+        })
+        ->with('author') // Đảm bảo Model Recipe có function author()
+        ->orderBy('created_at', 'desc')
+        ->paginate(9); 
+
+    return response()->json([
+        'category' => $category,
+        'recipes' => $recipes 
+    ]);
+}
+    public function search(Request $request)
+    {
     $query = Recipe::query();
 
     // 1. Tìm theo từ khóa
@@ -78,7 +97,7 @@ public function show($id)
                      ->get();
 
     return response()->json($recipes);
-}
+    }
 
 // Đảm bảo bạn CÓ hàm này để lấy danh sách Loại món
 public function getCategories() {

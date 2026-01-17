@@ -23,6 +23,8 @@ Route::get('/recipes', [RecipeController::class, 'index']); // Lấy danh sách
 Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
+Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
+
 
  Route::post('/recipes', [RecipeController::class, 'store']);
 // Route cần đăng nhập mới vào được (Test token)

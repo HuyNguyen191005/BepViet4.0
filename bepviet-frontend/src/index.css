@@ -170,177 +170,39 @@ body {
   justify-content: center;
   gap: 5px;
 }
-/* --- HEADER STYLES --- */
-.header-container {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
-.header-wrapper {
-    width: 100%;
-    max-width: 1200px; /* Độ rộng chuẩn của web */
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 15px;
+.nav-menu a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
 }
-
-/* 1. LOGO */
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
+.header-search input {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: 1px solid #ddd;
+  width: 250px;
 }
-.logo-img {
-    height: 45px;
-    margin-right: 10px;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.brand-name {
-    font-size: 22px;
-    font-weight: 800;
-    color: #003399; /* Màu xanh đậm của logo */
-}
-.brand-version {
-    font-size: 22px;
-    font-weight: 800;
-    color: #ff6600; /* Màu cam số 4.0 */
-    margin-left: 5px;
-}
-
-/* 2. MENU CENTER */
-.header-center {
-    display: flex;
-    gap: 30px;
-}
-.nav-item {
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-    font-size: 16px;
-    padding: 5px 0;
-    transition: color 0.2s;
-}
-.nav-item:hover, .nav-item.active {
-    color: #003399; /* Active màu xanh */
-}
-
-/* 3. RIGHT SECTION */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Search Box - Giống ảnh mẫu */
-.search-box {
-    background-color: #f0f2f5; /* Màu xám nhạt nền ô tìm kiếm */
-    border-radius: 99px; /* Bo tròn hình viên thuốc */
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    width: 250px;
-}
-.search-icon {
-    color: #888;
-    margin-right: 8px;
-    font-size: 14px;
-}
-.search-box input {
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-    color: #333;
-}
-
-/* User Actions */
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-/* Nút Đăng Bài (Màu cam) */
 .btn-post {
-    background-color: #ff9f00;
-    color: white;
-    font-weight: bold;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 99px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.2s;
-}
-.btn-post:hover {
-    background-color: #e68a00;
-}
-
-/* Avatar & User Name */
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    cursor: pointer;
-}
-.user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ddd;
-}
-.user-dropdown {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-}
-.user-name {
-    font-size: 13px;
-    font-weight: bold;
-    color: #333;
-}
-.logout-text {
-    font-size: 11px;
-    color: #888;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-}
-.logout-text:hover {
-    color: red;
-    text-decoration: underline;
-}
-
-/* Auth Buttons (Khi chưa đăng nhập) */
-.auth-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-.btn-login-text {
-    text-decoration: none;
-    color: #333;
-    font-weight: 600;
-}
-.btn-register-orange {
-    text-decoration: none;
-    background-color: #ff9f00;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 99px;
-    font-weight: bold;
+  background: #f59e0b;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 /* --- Hero Banner --- */
@@ -685,273 +547,141 @@ body {
   gap: 15px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-/* --- SEARCH PAGE LAYOUT --- */
-.search-page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9faff; /* Màu nền xanh rất nhạt */
+/* --- Categories --- */
+.category-section {
+  display: flex;
+  justify-content: center; /* Căn giữa toàn bộ nhóm icon ra giữa màn hình */
+  align-items: flex-start; /* Đảm bảo các icon hàng ngang bằng đầu nhau */
+  gap: 40px;
+  padding: 30px 0;
 }
 
-.breadcrumb {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-.current-crumb {
-    font-weight: bold;
-    color: #333;
-}
-
-.search-layout {
-    display: flex;
-    gap: 30px;
+.cat-item {
+  display: flex;
+  flex-direction: column; /* Xếp icon và chữ theo chiều dọc */
+  align-items: center;    /* Căn giữa icon và chữ theo trục ngang của chính nó */
+  text-align: center;
+  cursor: pointer;
+  width: 80px;            /* Đặt chiều rộng cố định để các mục đều nhau */
 }
 
-/* --- SIDEBAR FILTERS --- */
-.filter-sidebar {
-    width: 250px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    height: fit-content;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.cat-icon {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;    /* Căn giữa emoji theo chiều dọc bên trong vòng tròn */
+  justify-content: center; /* Căn giữa emoji theo chiều ngang bên trong vòng tròn */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 8px;     /* Khoảng cách giữa icon và chữ */
+  font-size: 24px;
+  transition: transform 0.2s; /* Thêm hiệu ứng khi hover */
 }
 
-.filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-.filter-header h3 {
-    font-size: 18px;
-    color: #003399;
-    margin: 0;
-}
-.btn-clear-filter {
-    color: #ff4d4f;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
+.cat-item:hover .cat-icon {
+  transform: scale(1.1);   /* Phóng to nhẹ khi di chuột vào */
 }
 
-.filter-group {
-    margin-bottom: 25px;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-}
-.filter-group h4 {
-    margin-bottom: 15px;
-    font-size: 16px;
-    color: #003399;
+.cat-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.2;
 }
 
-.checkbox-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-}
-.checkbox-row input {
-    margin-right: 10px;
-    accent-color: #ff9f00; /* Màu cam checkbox */
-}
-.count-badge {
-    background: #eee;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    color: #666;
+/* --- Categories Base State --- */
+.cat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease; /* Tạo hiệu ứng mượt mà cho toàn bộ thành phần */
+  width: 100px;
 }
 
-/* Slider Range (CSS cơ bản) */
-.range-slider {
-    width: 100%;
-    accent-color: #ff9f00;
-}
-.range-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px;
-}
-.highlight-text {
-    color: #ff9f00;
-    font-weight: bold;
-}
-
-/* --- MAIN RESULTS CONTENT --- */
-.results-content {
-    flex: 1;
+.cat-icon {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 10px;
+  font-size: 26px;
+  /* Quan trọng: transition riêng cho icon để nó chuyển động độc lập */
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              box-shadow 0.3s ease, 
+              background-color 0.3s ease;
 }
 
-.results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    background: #fff;
-    padding: 15px;
-    border-radius: 8px;
-}
-.results-title {
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.result-count-badge {
-    background-color: #fff7e6; /* Màu vàng nhạt nền badge */
-    color: #d48806;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: bold;
+.cat-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563; /* Màu xám đậm mặc định */
+  transition: color 0.3s ease;
 }
 
-.sort-box select {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-left: 5px;
-    outline: none;
+/* --- Hover Effects --- */
+
+/* 1. Khi di chuột vào Item: Icon sẽ bay lên và to ra */
+.cat-item:hover .cat-icon {
+  transform: translateY(-8px) scale(1.15); /* Bay lên 8px và to thêm 15% */
+  box-shadow: 0 12px 20px rgba(0,0,0,0.15); /* Đổ bóng sâu hơn tạo cảm giác nổi */
+  background-color: #fffbeb; /* Đổi nền trắng sang vàng cực nhạt */
 }
 
-/* --- GRID & CARD STYLES --- */
-.recipe-grid-modern {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+/* 2. Khi di chuột vào Item: Chữ sẽ đổi màu cam giống màu chủ đạo của bạn */
+.cat-item:hover span {
+  color: #f59e0b; /* Màu cam thương hiệu */
 }
 
-.recipe-card-modern {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
-    border: 1px solid #f0f0f0;
+/* 3. Hiệu ứng Click (Active): Nhấn xuống một chút */
+.cat-item:active .cat-icon {
+  transform: translateY(-2px) scale(1.05);
+  transition: 0.1s;
 }
-.recipe-card-modern:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+/* 1. Sáng - Xanh lá */
+.cat-item:nth-child(1):hover .cat-icon {
+  background-color: #22c55e;
+  color: white !important;
+  box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
 }
+.cat-item:nth-child(1):hover span { color: #22c55e; }
 
-/* Image Area */
-.card-image-wrapper {
-    position: relative;
-    height: 180px;
+/* 2. Món chính - Xanh lá đậm */
+.cat-item:nth-child(2):hover .cat-icon {
+  background-color: #15803d;
+  color: white !important;
+  box-shadow: 0 5px 15px rgba(21, 128, 61, 0.4);
 }
-.card-image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.heart-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    color: #888;
-}
-.time-badge {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-}
+.cat-item:nth-child(2):hover span { color: #15803d; }
 
-/* Card Body */
-.card-body {
-    padding: 15px;
+/* 3. Tráng miệng - Đỏ */
+.cat-item:nth-child(3):hover .cat-icon {
+  background-color: #ef4444;
+  color: white !important;
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
 }
-.card-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #003399; /* Màu chữ tiêu đề xanh đậm */
-    margin-bottom: 8px;
-    display: block;
-    text-decoration: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+.cat-item:nth-child(3):hover span { color: #ef4444; }
 
-.card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+/* 4. Miền Bắc - Cam */
+.cat-item:nth-child(4):hover .cat-icon {
+  background-color: #f97316;
+  color: white !important;
+  box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
 }
-.rating {
-    font-size: 13px;
-    color: #ffc107; /* Màu vàng sao */
-}
-.score {
-    font-weight: bold;
-    color: #333;
-    margin: 0 3px;
-}
-.review-count {
-    color: #999;
-}
+.cat-item:nth-child(4):hover span { color: #f97316; }
 
-/* Difficulty Badges */
-.difficulty-pill {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-weight: 500;
-}
-.green-badge {
-    background-color: #e6f7ff;
-    color: #00a854; /* Màu xanh lá cho Dễ */
-}
-.yellow-badge {
-    background-color: #fffbe6;
-    color: #faad14;
-}
-.red-badge {
-    background-color: #fff1f0;
-    color: #f5222d;
-}
-
-/* Card Footer */
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 10px;
-    font-size: 12px;
-    color: #666;
-}
-.author-info {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-.author-avatar {
-    border-radius: 50%;
+/* 5. Miền Nam - Xanh dương */
+.cat-item:nth-child(5):hover .cat-icon {
+  background-color: #3b82f6;
+  color: white !important;
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
 }
 .author-name {
     font-weight: 500;
@@ -1232,3 +962,4 @@ body {
 .cr-btn-publish:hover { background-color: #ea580c; transform: translateY(-1px); }
 
 /* --- KẾT THÚC CSS CREATE RECIPE --- */
+.cat-item:nth-child(5):hover span { color: #3b82f6; }

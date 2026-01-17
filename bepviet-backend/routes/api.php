@@ -24,5 +24,6 @@ Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 
+ Route::post('/recipes', [RecipeController::class, 'store']);
 // Route cần đăng nhập mới vào được (Test token)
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);

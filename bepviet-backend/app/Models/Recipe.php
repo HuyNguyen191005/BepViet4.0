@@ -12,17 +12,17 @@ class Recipe extends Model
     protected $table = 'recipes';
     protected $primaryKey = 'recipe_id'; // Khóa chính của bạn
 
-    // protected $fillable = [
-    //     'title',
-    //     'description',
-    //     'cooking_time', // Sửa lại cho đúng tên cột trong ảnh
-    //     'servings',     // Số người ăn
-    //     'difficulty',
-    //     'image_url',
-    //     'status',
-    //     'views',
-    //     'user_id'
-    // ];
+  protected $fillable = [
+        'title',
+        'description',
+        'cooking_time',
+        'difficulty',
+        'image_url', // Sửa từ 'image' thành 'image_url'
+        'status',
+        'user_id',   // Sửa từ 'author_id' thành 'user_id'
+        'views',     // Thêm luôn views nếu cần
+        'servings'   // Thêm servings nếu cần
+    ];
 
     // 1. Quan hệ với người đăng (User)
     public function author()

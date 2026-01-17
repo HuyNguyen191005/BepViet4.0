@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header'; // Nhớ import Header bạn đã tách
-
+import Footer from "./Footer";
 export default function DefaultLayout() {
     return (
         <div>
@@ -11,9 +11,7 @@ export default function DefaultLayout() {
                 <Outlet /> {/* Nội dung trang con sẽ chui vào đây */}
             </div>
             
-            <footer style={{textAlign: 'center', marginTop: '50px', padding: '20px', background: '#f1f1f1'}}>
-                © 2024 Bếp Việt 4.0
-            </footer>
+            <Footer /> {/* Footer luôn hiện ở đây */}
         </div>
     );
 }

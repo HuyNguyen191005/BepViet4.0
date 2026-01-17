@@ -148,43 +148,6 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-
-            {/* 6. FOOTER */}
-            <footer className="footer">
-                <div>
-                    <div style={{display:'flex', alignItems:'center', marginBottom:'15px'}}>
-                        <img src="/logo.png" alt="" style={{height:'40px', background:'white', borderRadius:'50%', padding:'2px', marginRight:'10px'}} />
-                        <h2 style={{color:'white', margin:0}}>BẾP VIỆT 4.0</h2>
-                    </div>
-                    <p style={{lineHeight:'1.6'}}>Tinh hoa ẩm thực Việt trong kỷ nguyên số.<br/>Kết nối đam mê, chia sẻ hương vị.</p>
-                </div>
-                <div>
-                    <h3>VỀ CHÚNG TÔI</h3>
-                    <ul>
-                        <li>Giới thiệu</li>
-                        <li>Liên hệ</li>
-                        <li>Điều khoản sử dụng</li>
-                        <li>Chính sách bảo mật</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>KẾT NỐI</h3>
-                    <ul>
-                        <li>Facebook</li>
-                        <li>Youtube</li>
-                        <li>Instagram</li>
-                        <li>Tiktok</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>NHẬN TIN MỚI</h3>
-                    <p style={{marginBottom:'10px'}}>Nhận công thức ngon mỗi tuần:</p>
-                    <div className="footer-input">
-                        <input type="text" placeholder="Email của bạn..." />
-                        <button>Gửi</button>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };

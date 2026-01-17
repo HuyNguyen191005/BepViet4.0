@@ -13,7 +13,10 @@ export default function Header() {
             setUser(JSON.parse(userStr));
         }
     }, []);
-
+const handleCreateClick = () => {
+    // Chuyển hướng sang trang tạo công thức
+    navigate('/create-recipe');
+  };
     const handleLogout = () => {
         localStorage.removeItem('ACCESS_TOKEN');
         localStorage.removeItem('USER_INFO');
@@ -70,7 +73,7 @@ export default function Header() {
                     {user ? (
                         <div className="user-actions">
                             {/* Nút Đăng bài */}
-                            <button className="btn-post">
+                    <button className="btn-upload" onClick={handleCreateClick}>
                                 + Đăng bài
                             </button>
 

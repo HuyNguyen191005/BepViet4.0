@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
 import SearchResults from './pages/SearchResults'; // Import trang tìm kiếm (đường dẫn tùy nơi bạn lưu)
 import DefaultLayout from './components/DefaultLayout'; // Import Layout vừa tạo
-
+import CreateRecipe from './pages/CreateRecipe';
 function App() {
   return (
     <BrowserRouter>
@@ -16,6 +16,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/recipes/:id" element={<RecipeDetail />} />
             <Route path="/search" element={<SearchResults />} /> {/* Thêm route tìm kiếm */}
+            <Route path="/create-recipe" element={<CreateRecipe />} />
         </Route>
 
         {/* --- NHÓM 2: CÁC TRANG KHÔNG CÓ HEADER (Đứng độc lập) --- */}

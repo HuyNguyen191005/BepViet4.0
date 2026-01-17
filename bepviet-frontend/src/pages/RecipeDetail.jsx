@@ -85,24 +85,43 @@ const RecipeDetail = () => {
                         </div>
                     </div>
 
-                    {/* CỘT CÁCH LÀM (Lấy từ bảng steps) */}
-                    <div className="steps-box">
-                        <div className="ing-header">📝 CÁCH LÀM</div>
-                        {recipe.steps && recipe.steps.length > 0 ? (
-                            recipe.steps.map((step) => (
-                                <div key={step.step_id} className="step-item">
-                                    <div className="step-title">Bước {step.step_order}</div>
-                                    <p style={{fontSize:'15px', lineHeight:'1.6'}}>{step.content}</p>
-                                    {/* Nếu bước đó có ảnh thì hiện, không có thì thôi */}
-                                    {step.image_url && (
-                                        <img src={step.image_url} className="step-img" alt={`Step ${step.step_order}`} />
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <p>Chưa có hướng dẫn cụ thể cho món này.</p>
-                        )}
-                    </div>
+{/* CỘT CÁCH LÀM (Lấy từ bảng steps) */}
+<div className="steps-box">
+    <div className="ing-header">📝 CÁCH LÀM</div>
+    
+    {recipe.steps && recipe.steps.length > 0 ? (
+        recipe.steps.map((step) => (
+            <div key={step.step_id} className="step-item">
+                <div className="step-title">Bước {step.step_order}</div>
+                <p style={{fontSize:'15px', lineHeight:'1.6'}}>{step.content}</p>
+                
+                {/* --- PHẦN SỬA ĐỔI: Hiển thị ảnh với đường dẫn đầy đủ --- */}
+                {step.image_url && (
+                    <img 
+                        // 👇 QUAN TRỌNG: Ghép domain server + storage + tên file
+                    src={step.image_url}
+                        
+                        className="step-img" 
+                        alt={`Step ${step.step_order}`} 
+                        
+                        // Thêm chút style để ảnh gọn gàng, không bị tràn khung
+                        style={{
+                            marginTop: '10px', 
+                            maxWidth: '100%', 
+                            height: 'auto',
+                            borderRadius: '8px', 
+                            display: 'block'
+                        }}
+                    />
+                )}
+                {/* ------------------------------------------------------- */}
+                
+            </div>
+        ))
+    ) : (
+        <p>Chưa có hướng dẫn cụ thể cho món này.</p>
+    )}
+</div>
                 </div>
 
                 {/* BÌNH LUẬN (Lấy từ bảng reviews) */}

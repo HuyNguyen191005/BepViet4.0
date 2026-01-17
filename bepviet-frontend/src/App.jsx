@@ -30,7 +30,7 @@ function App() {
         {/* Tất cả các trang nội dung phải nằm trong cặp thẻ này */}
         <Route element={<DefaultLayout />}>
             
-            {/* Trang chủ */}
+            {/* Trang chủu */}
             <Route path="/" element={<Home />} />
             
             {/* Chi tiết công thức & Tạo mới */}

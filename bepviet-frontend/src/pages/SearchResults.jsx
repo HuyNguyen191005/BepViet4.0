@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import axiosClient from '../api/axiosClient'; // Đảm bảo bạn đã config axios
+import axiosClient from '../api/axiosClient'; // Đảm bảo đường dẫn import đúng
 
 const SearchResults = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -8,47 +8,58 @@ const SearchResults = () => {
 
     // State dữ liệu
     const [recipes, setRecipes] = useState([]);
-    const [categories, setCategories] = useState([]); // List danh mục lấy từ DB
+    const [categories, setCategories] = useState([]); 
     const [loading, setLoading] = useState(true);
 
     // State bộ lọc
-    const [selectedCats, setSelectedCats] = useState([]); // Mảng ID category đã chọn
-    const [selectedDiff, setSelectedDiff] = useState([]); // Mảng độ khó đã chọn
-    const [maxTime, setMaxTime] = useState(120); // Mặc định 120p
+    const [selectedCats, setSelectedCats] = useState([]); 
+    const [selectedDiff, setSelectedDiff] = useState([]); 
+    const [maxTime, setMaxTime] = useState(120); 
+
+    // --- HÀM XỬ LÝ ẢNH (QUAN TRỌNG) ---
+    const getImageUrl = (imagePath) => {
+        // 1. Nếu không có dữ liệu ảnh -> Trả về ảnh mặc định
+        if (!imagePath) return '/default-food.png'; 
+
+        // 2. Nếu ảnh đã là link online (bắt đầu bằng http hoặc https) -> Giữ nguyên
+        if (imagePath.startsWith('http')) {
+            return imagePath;
+        }
+
+        // 3. Nếu là tên file từ DB -> Nối domain backend vào
+        // Lưu ý: Laravel thường lưu trong /storage/. Nếu bạn dùng /images/ thì sửa lại chữ storage thành images
+        return `http://localhost:8000/storage/${imagePath}`; 
+    };
 
     // 1. Lấy danh sách Category khi vào trang
     useEffect(() => {
-        axiosClient.get('/categories').then(res => {
-            setCategories(res.data);
-        });
+        axiosClient.get('/categories')
+            .then(res => setCategories(res.data))
+            .catch(err => console.error("Lỗi lấy danh mục:", err));
     }, []);
 
     // 2. Gọi API Search khi filter thay đổi
     useEffect(() => {
         const fetchRecipes = async () => {
             setLoading(true);
-           try {
-            // -- ĐOẠN SỬA ĐỔI --
-            // Chỉ thêm vào params những gì có giá trị
-            const params = {
-                query: query,
-                max_time: maxTime,
-            };
+            try {
+                const params = {
+                    query: query,
+                    max_time: maxTime,
+                };
 
-            // Nếu mảng selectedCats có phần tử mới gửi đi
-            if (selectedCats.length > 0) {
-                params.categories = selectedCats.join(',');
-            }
+                if (selectedCats.length > 0) {
+                    params.categories = selectedCats.join(',');
+                }
 
-            // Nếu mảng selectedDiff có phần tử mới gửi đi
-            if (selectedDiff.length > 0) {
-                params.difficulty = selectedDiff.join(',');
-            }
+                if (selectedDiff.length > 0) {
+                    params.difficulty = selectedDiff.join(',');
+                }
 
                 const response = await axiosClient.get('/recipes/search', { params });
                 setRecipes(response.data);
             } catch (error) {
-                console.error("Lỗi:", error);
+                console.error("Lỗi tìm kiếm:", error);
             } finally {
                 setLoading(false);
             }
@@ -58,7 +69,6 @@ const SearchResults = () => {
     }, [query, selectedCats, selectedDiff, maxTime]);
 
     // --- CÁC HÀM XỬ LÝ FILTER ---
-
     const handleCategoryChange = (catId) => {
         setSelectedCats(prev => 
             prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
@@ -71,7 +81,6 @@ const SearchResults = () => {
         );
     };
 
-    // Hàm helper hiển thị màu độ khó
     const getDifficultyClass = (diff) => {
         if (diff === 'Dễ') return 'green-badge';
         if (diff === 'Trung bình') return 'yellow-badge';
@@ -97,7 +106,7 @@ const SearchResults = () => {
                         </button>
                     </div>
 
-                    {/* Filter 1: Danh mục (Load từ DB) */}
+                    {/* Filter 1: Danh mục */}
                     <div className="filter-group">
                         <h4>Loại món</h4>
                         {categories.map(cat => (
@@ -112,7 +121,7 @@ const SearchResults = () => {
                         ))}
                     </div>
 
-                    {/* Filter 2: Độ khó (Hardcode theo Enum DB) */}
+                    {/* Filter 2: Độ khó */}
                     <div className="filter-group">
                         <h4>Độ khó</h4>
                         {['Dễ', 'Trung bình', 'Khó'].map(level => (
@@ -157,8 +166,16 @@ const SearchResults = () => {
                             {recipes.length > 0 ? recipes.map((recipe) => (
                                 <div key={recipe.recipe_id} className="recipe-card-modern">
                                     <div className="card-image-wrapper">
-                                        {/* Hiển thị ảnh (Giả sử ảnh ở thư mục public/images) */}
-                                        <img src={`http://localhost:8000/images/${recipe.image_url}`} alt={recipe.title} onError={(e)=>{e.target.src='https://via.placeholder.com/300'}} />
+                                        {/* --- SỬA LỖI ẢNH TẠI ĐÂY --- */}
+                                        <img 
+                                            // Kiểm tra cả 2 trường hợp tên biến
+                                            src={getImageUrl(recipe.image_url || recipe.image)} 
+                                            alt={recipe.title} 
+                                            onError={(e)=>{
+                                                e.target.onerror = null; 
+                                                e.target.src = '/default-food.png'; // Ảnh dự phòng local
+                                            }} 
+                                        />
                                         <span className="time-badge">⏱ {recipe.cooking_time}p</span>
                                     </div>
 
@@ -170,11 +187,10 @@ const SearchResults = () => {
                                         <div className="card-meta">
                                             <div className="rating">
                                                 <span className="star">★</span> 
-                                                {/* Hiển thị rating trung bình tính từ DB */}
                                                 <span className="score">
                                                     {recipe.reviews_avg_rating ? parseFloat(recipe.reviews_avg_rating).toFixed(1) : '0.0'}
                                                 </span>
-                                                <span className="review-count">({recipe.reviews_count})</span>
+                                                <span className="review-count">({recipe.reviews_count || 0})</span>
                                             </div>
                                             
                                             <span className={`difficulty-pill ${getDifficultyClass(recipe.difficulty)}`}>
@@ -187,7 +203,7 @@ const SearchResults = () => {
                                         </div>
                                     </div>
                                 </div>
-                            )) : <p>Không tìm thấy món nào.</p>}
+                            )) : <p>Không tìm thấy món nào phù hợp với bộ lọc.</p>}
                         </div>
                     )}
                 </main>

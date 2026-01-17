@@ -13,10 +13,12 @@ export default function Header() {
             setUser(JSON.parse(userStr));
         }
     }, []);
-const handleCreateClick = () => {
-    // Chuyển hướng sang trang tạo công thức
-    navigate('/create-recipe');
-  };
+
+    const handleCreateClick = () => {
+        // Chuyển hướng sang trang tạo công thức
+        navigate('/create-recipe');
+    };
+
     const handleLogout = () => {
         localStorage.removeItem('ACCESS_TOKEN');
         localStorage.removeItem('USER_INFO');
@@ -29,6 +31,18 @@ const handleCreateClick = () => {
         if (e.key === 'Enter' && keyword.trim() !== '') {
             navigate(`/search?query=${keyword}`);
         }
+    };
+
+    // --- HÀM XỬ LÝ LINK ẢNH AVATAR (MỚI THÊM) ---
+    const getAvatarUrl = (imageName) => {
+        // 1. Nếu không có tên ảnh -> Trả về ảnh mặc định trong thư mục public
+        if (!imageName) return '/default-avatar.png'; 
+        
+        // 2. Nếu là link online (Google/FB) -> Giữ nguyên
+        if (imageName.startsWith('http')) return imageName;
+
+        // 3. Nếu là file từ DB -> Nối domain backend vào
+        return `http://localhost:8000/storage/${imageName}`; 
     };
 
     return (
@@ -73,16 +87,21 @@ const handleCreateClick = () => {
                     {user ? (
                         <div className="user-actions">
                             {/* Nút Đăng bài */}
-                    <button className="btn-upload" onClick={handleCreateClick}>
+                            <button className="btn-upload" onClick={handleCreateClick}>
                                 + Đăng bài
                             </button>
 
                             {/* Avatar & Tên */}
                             <div className="user-profile">
+                                {/* --- SỬA THẺ IMG TẠI ĐÂY --- */}
                                 <img 
-                                    src="https://via.placeholder.com/40" // Thay bằng user.avatar nếu có
+                                    src={getAvatarUrl(user.avatar || user.image)} 
                                     alt="Avatar" 
                                     className="user-avatar" 
+                                    onError={(e) => {
+                                        e.target.onerror = null; 
+                                        e.target.src = '/default-avatar.png'; // Ảnh dự phòng khi lỗi
+                                    }}
                                 />
                                 <div className="user-dropdown">
                                     <span className="user-name">Chào, {user.full_name}</span>

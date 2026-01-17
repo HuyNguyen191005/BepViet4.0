@@ -18,7 +18,7 @@ const VegetarianPage = () => {
     useEffect(() => {
         setLoading(true);
         // Gọi API lấy 8 món/trang từ Laravel
-        axiosClient.get(`/categories/8/recipes?page=${currentPage}`)
+        axiosClient.get(`/categories/4/recipes?page=${currentPage}`)
             .then(res => {
                 setRecipes(res.data.recipes.data);
                 setPagination(res.data.recipes);
@@ -37,7 +37,7 @@ const VegetarianPage = () => {
         window.location.href = '/login';
     };
 
-    if (loading) return <div style={{textAlign:'center', marginTop:'100px'}}>Đang tải món ăn sáng...</div>;
+    if (loading) return <div style={{textAlign:'center', marginTop:'100px'}}>Đang tải món ngon thanh tịnh...</div>;
 
     return (
         <div className="home-page">
@@ -81,9 +81,9 @@ const VegetarianPage = () => {
             </header>
 
             {/* 2. BANNER */}
-            <div className="hero-section" style={{background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/vegetable-bg.jpg")', backgroundColor: '#ef4444'}}>
-                <h1 className="hero-title">{category?.name?.toUpperCase() || 'LẨU'} </h1>
-                <p style={{fontStyle:'italic', opacity: 0.9}}>“{category?.description || 'Tổng hợp các món ăn sáng, dễ làm, tốt cho sức khỏe'}”</p>
+            <div className="hero-section" style={{background: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/vegetable-bg.jpg")', backgroundColor: '#22c55e'}}>
+                <h1 className="hero-title">{category?.name?.toUpperCase() || 'MÓN CHAY'} THANH TỊNH</h1>
+                <p style={{fontStyle:'italic', opacity: 0.9}}>“{category?.description || 'Tổng hợp các món chay ngon, dễ làm, tốt cho sức khỏe'}”</p>
             </div>
 
             {/* 3. DANH SÁCH MÓN ĂN (3 MÓN/HÀNG) */}

@@ -18,7 +18,7 @@ const VegetarianPage = () => {
     useEffect(() => {
         setLoading(true);
         // Gọi API lấy 8 món/trang từ Laravel
-        axiosClient.get(`/categories/9/recipes?page=${currentPage}`)
+        axiosClient.get(`/categories/2/recipes?page=${currentPage}`)
             .then(res => {
                 setRecipes(res.data.recipes.data);
                 setPagination(res.data.recipes);

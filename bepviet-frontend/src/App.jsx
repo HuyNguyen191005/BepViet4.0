@@ -5,10 +5,10 @@ import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
 
 import Havebreakfast from './pages/HaveBreakfastPage';
-import CakePage from './pages/CakePage';
-import BeveragePage from './pages/BeveragePage';
-import HotPotPage from './pages/HotPotPage';
-import VegetarianPage from './pages/VegetarianPage';
+import Dessert from './pages/Dessert';
+import Maincourse from './pages/MainCourse';
+import Southern from './pages/Southern';
+import North from './pages/North';
 
 // THÊM CÁC DÒNG IMPORT NÀY (Đảm bảo đúng đường dẫn file của bạn)
 // import DefaultLayout from './components/DefaultLayout'; 
@@ -27,10 +27,10 @@ function App() {
         {/* Tạm thời để các Route phẳng ra như dưới đây để kiểm tra: */}
         <Route path="/" element={<Home />} />
         <Route path="/an-sang" element={<Havebreakfast />} />
-        <Route path="/mon-chay" element={<VegetarianPage />} />
-        <Route path="/do-uong" element={<BeveragePage />} />
-        <Route path="/banh" element={<CakePage />} />
-        <Route path="/mon-lau" element={<HotPotPage />} />
+        <Route path="/trang-mieng" element={<Dessert />} />
+        <Route path="/mon-chinh" element={<Maincourse />} />
+        <Route path="/mien-nam" element={<Southern />} />
+        <Route path="/mien-bac" element={<North />} />
 
         {/* Các trang không có Header */}
 

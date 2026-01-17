@@ -5,24 +5,20 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
-<<<<<<< HEAD
-=======
-
->>>>>>> 2acc1d928f96f794e1c4f5ecba4ecabdc5759f7d
 class RecipeController extends Controller
 {
-public function index()
-{
-    // Lấy các món có status là 'Published', mới nhất lên đầu
-    $recipes = Recipe::with('author')
-                    ->where('status', 'Published') 
-                    ->orderBy('created_at', 'desc')
-                    ->take(8)
-                    ->get();
-    
-    return response()->json($recipes);
-}
-public function show($id)
+    public function index()
+    {
+        // Lấy các món có status là 'Published', mới nhất lên đầu
+        $recipes = Recipe::with('author')
+                        ->where('status', 'Published') 
+                        ->orderBy('created_at', 'desc')
+                        ->take(8)
+                        ->get();
+        
+        return response()->json($recipes);
+    }
+    public function show($id)
     {
         // Eager Load: Lấy Recipe kèm theo:
         // 1. author: Tác giả món ăn
@@ -39,21 +35,26 @@ public function show($id)
         return response()->json($recipe);   
     }
     public function getByCategory($id)
-    {
-        $category = Category::findOrFail($id);
-    
-        // Thay ->get() bằng ->paginate(8)
-        $recipes = Recipe::whereHas('categories', function($query) use ($id) {
-            $query->where('categories.category_id', $id);
-        })->with('author')->paginate(9); 
-    
-        return response()->json([
-            'category' => $category,
-            'recipes' => $recipes 
-        ]);
-    }
-   public function search(Request $request)
 {
+    // Kiểm tra Category có tồn tại không
+    $category = Category::findOrFail($id);
+
+    $recipes = Recipe::where('status', 'Published') // Thêm lọc trạng thái
+        ->whereHas('categories', function($query) use ($id) {
+            // Sử dụng tên bảng pivot hoặc quan hệ chuẩn
+            $query->where('categories.category_id', $id);
+        })
+        ->with('author') // Đảm bảo Model Recipe có function author()
+        ->orderBy('created_at', 'desc')
+        ->paginate(9); 
+
+    return response()->json([
+        'category' => $category,
+        'recipes' => $recipes 
+    ]);
+}
+    public function search(Request $request)
+    {
     $query = Recipe::query();
 
     // 1. Tìm theo từ khóa
@@ -99,51 +100,5 @@ public function show($id)
     public function getCategories() {
         return response()->json(\App\Models\Category::all());
     }
-   public function search(Request $request)
-{
-    $query = Recipe::query();
-
-    // 1. Tìm theo từ khóa
-    if ($request->filled('query')) {
-        $keyword = $request->input('query');
-        $query->where('title', 'like', '%' . $keyword . '%');
-    }
-
-    // 2. Lọc Category (CHỈ LỌC KHI CÓ DỮ LIỆU)
-    if ($request->filled('categories')) {
-        $categoryIds = explode(',', $request->input('categories'));
-        // Kiểm tra xem mảng có rỗng không trước khi lọc
-        if (!empty($categoryIds) && $categoryIds[0] != "") {
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
-                $q->whereIn('categories.category_id', $categoryIds);
-            });
-        }
-    }
-
-    // 3. Lọc Độ khó (CHỈ LỌC KHI CÓ DỮ LIỆU)
-    if ($request->filled('difficulty')) {
-        $difficulties = explode(',', $request->input('difficulty'));
-        if (!empty($difficulties) && $difficulties[0] != "") {
-            $query->whereIn('difficulty', $difficulties);
-        }
-    }
-
-    // 4. Lọc Thời gian
-    if ($request->filled('max_time')) {
-        $query->where('cooking_time', '<=', $request->input('max_time'));
-    }
-
-    // 5. Lấy kèm dữ liệu liên quan
-    $recipes = $query->with('categories')
-                     ->withAvg('reviews', 'rating')
-                     ->withCount('reviews')
-                     ->get();
-
-    return response()->json($recipes);
-}
-
-// Đảm bảo bạn CÓ hàm này để lấy danh sách Loại món
-public function getCategories() {
-    return response()->json(\App\Models\Category::all());
-}
+ 
 }

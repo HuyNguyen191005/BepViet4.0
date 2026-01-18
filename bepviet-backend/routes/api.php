@@ -4,7 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
+
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,6 +27,7 @@ Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
+
 Route::get('/posts', [PostController::class, 'index']);
 // Route::post('/posts', [PostController::class, 'store']);
 Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'show']);
@@ -36,3 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'store']); 
     
 });
+
+Route::get('/admin/users', [UserController::class, 'index']);
+
+Route::post('/recipes', [RecipeController::class, 'store']);
+// Route cần đăng nhập mới vào được (Test token)
+Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+

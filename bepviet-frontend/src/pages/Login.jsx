@@ -14,22 +14,22 @@ const Login = () => {
         setError(''); // Reset lỗi cũ
 
         try {
-            // Gọi API đăng nhập
             const res = await axiosClient.post('/login', { email, password });
 
-            // 1. Lưu token và thông tin user vào localStorage
-            localStorage.setItem('ACCESS_TOKEN', res.data.access_token);
+            // Lưu token (Dùng || để đề phòng Backend đổi tên biến)
+            localStorage.setItem('ACCESS_TOKEN', res.data.access_token || res.data.token);
             localStorage.setItem('USER_INFO', JSON.stringify(res.data.user));
 
-            // 2. Thông báo thành công
-            alert("Đăng nhập thành công!");
+            const user = res.data.user;
 
-            // 3. Chuyển hướng về trang chủ
-            navigate('/');
-            
-            // 4. (Mẹo nhỏ) Load lại trang để Navbar cập nhật hiển thị tên User ngay lập tức
-            // Nếu bạn dùng Context API xịn xò thì không cần dòng này, nhưng mới làm thì nên dùng.
-            window.location.reload(); 
+            // ĐIỀU HƯỚNG DUY NHẤT 1 LẦN
+            if (user.role === 'Admin') {
+                alert("Chào mừng Admin!");
+                window.location.href = '/admin'; // Dùng href để vừa chuyển hướng vừa load lại dữ liệu
+            } else {
+                alert("Đăng nhập thành công!");
+                window.location.href = '/'; 
+            }
 
         } catch (err) {
             // Xử lý lỗi trả về từ Backend

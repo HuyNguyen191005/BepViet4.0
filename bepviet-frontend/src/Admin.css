@@ -414,3 +414,236 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- DASHBOARD WRAPPER --- */
+.dashboard-wrapper {
+    padding: 10px;
+    animation: fadeIn 0.5s ease-out; /* Hiệu ứng hiện trang từ từ */
+}
+
+.dashboard-header-card {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.dash-title {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.dash-subtitle {
+    color: #666;
+    margin: 5px 0 0 0;
+    font-size: 14px;
+}
+
+/* --- STATS CARDS (Các thẻ thống kê) --- */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+/* Màu sắc icon box */
+.stat-icon-box.blue { background-color: #eff6ff; color: #3b82f6; }
+.stat-icon-box.orange { background-color: #fff7ed; color: #f97316; }
+.stat-icon-box.gold { background-color: #fefce8; color: #eab308; }
+
+.stat-title {
+    display: block;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.stat-value {
+    margin: 4px 0;
+    font-size: 28px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.stat-desc {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.stat-desc.green { color: #22c55e; }
+.stat-desc.yellow { color: #f59e0b; }
+
+/* --- CHART SECTION (Khu vực biểu đồ) --- */
+.chart-section {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+    margin-bottom: 30px;
+}
+
+.chart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.chart-head h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+}
+
+.chart-select {
+    padding: 8px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #64748b;
+    outline: none;
+    cursor: pointer;
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.blue { background-color: #6366f1; }
+.dot.pink { background-color: #d946ef; }
+
+/* --- ACTIVITY SECTION (Hoạt động gần đây) --- */
+.activity-section {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+}
+
+.activity-header {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.act-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* Màu nền icon hoạt động */
+.blue-bg { background-color: #e0f2fe; }
+.orange-bg { background-color: #ffedd5; }
+.green-bg { background-color: #dcfce7; }
+.sky-bg { background-color: #f0f9ff; }
+
+.act-info p {
+    margin: 0;
+    font-size: 15px;
+    color: #475569;
+}
+
+.act-info span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Animation mượt mà */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.activity-section {
+    background: #fff;
+    margin-top: 25px;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.activity-header h3 {
+    font-size: 1.1rem;
+    color: #1e293b;
+    margin-bottom: 20px;
+}
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+.activity-item:hover { background: #f8fafc; }
+.activity-item:last-child { border-bottom: none; }
+.act-icon-box {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 15px; font-size: 1.2rem;
+}
+.blue-bg { background: #e0f2fe; color: #0284c7; }
+.orange-bg { background: #ffedd5; color: #ea580c; }
+.act-info p { margin: 0; font-size: 0.95rem; color: #334155; }
+.act-info span { font-size: 0.8rem; color: #94a3b8; }

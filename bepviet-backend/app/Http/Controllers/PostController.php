@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Activity; // 2. Thêm cái này để ghi Activity
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -60,6 +61,14 @@ class PostController extends Controller
             'type' => $validated['type'],
             'thumbnail' => $thumbnailPath,
             'views' => 0,
+        ]);
+        // Trong RecipeController.php sau khi $recipe = Recipe::create(...) thành công
+       // Sửa $recipe thành $post và type thành 'post'
+        Activity::create([
+            'user_id' => auth()->id(),
+            'username' => auth()->user()->full_name,
+            'action' => 'vừa đăng bài viết mới: ' . $post->title, // Dùng $post->title mới đúng
+            'type' => 'post' // Chuyển type thành post để hiển thị icon khác nếu cần
         ]);
 
         return response()->json(['message' => 'Đăng thành công!', 'post' => $post], 201);

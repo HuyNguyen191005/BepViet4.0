@@ -7,7 +7,7 @@ use App\Http\Controllers\RecipeController;
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +55,5 @@ Route::get('/admin/users', [UserController::class, 'index']);
 Route::put('/admin/users/{id}', [UserController::class, 'update']); // Sửa thông tin
 Route::patch('/admin/users/{id}/status', [UserController::class, 'toggleStatus']); // Khóa/Mở khóa
 Route::delete('/admin/users/{id}', [UserController::class, 'destroy']); // Xóa tài khoản
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);

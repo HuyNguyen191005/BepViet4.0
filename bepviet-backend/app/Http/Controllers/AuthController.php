@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Activity;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -51,6 +52,12 @@ class AuthController extends Controller
             'password_hash' => Hash::make($fields['password']), 
             'role' => 'User', 
         ]);
+        Activity::create([
+            'user_id' => $user->user_id,
+            'username' => $user->full_name,
+            'action' => 'vừa đăng ký tài khoản mới',
+            'type' => 'user'
+        ]);
 
         // 👇 THAY ĐỔI: Không tạo token nữa.
         // Chỉ trả về thông báo thành công để Frontend chuyển trang Login.
@@ -80,7 +87,13 @@ class AuthController extends Controller
 
         // Tạo token
         $token = $user->createToken('authToken')->plainTextToken;
-
+       // Cuối hàm login trước khi return response
+        Activity::create([
+            'user_id' => $user->user_id,
+            'username' => $user->full_name,
+            'action' => 'vừa đăng nhập vào hệ thống',
+            'type' => 'user'
+        ]);
         return response()->json([
             'message' => 'Đăng nhập thành công',
             'access_token' => $token,

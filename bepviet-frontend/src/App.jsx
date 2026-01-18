@@ -23,7 +23,7 @@ import Blog from './pages/Blog';
 import PostDetail from './pages/PostDetail'; 
 import CreatePost from './pages/CreatePost';
 
-
+import AdminDashboard from './pages/AdminDashboard';
 
 
 function App() {
@@ -73,9 +73,11 @@ function App() {
          {/* Nhóm trang Admin */}
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
         {/* Trang mặc định khi vào /admin là Tổng quan */}
-        {/* <Route index element={<AdminDashboard />} />  */}
+        <Route index element={<AdminDashboard />} />  
         {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
         <Route path="users" element={<AdminPanel />} /> 
+        
+        
         </Route>
       </Routes>
     </BrowserRouter>

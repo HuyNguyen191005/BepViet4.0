@@ -16,6 +16,11 @@ import DefaultLayout from './components/DefaultLayout';
 import CreateRecipe from './pages/CreateRecipe';
 import AdminLayout from './pages/AdminLayout';
 import AdminPanel from './pages/AdminPanel';
+
+import Blog from './pages/Blog';
+import PostDetail from './pages/PostDetail'; 
+import CreatePost from './pages/CreatePost';
+
 function App() {
   const getUserInfo = () => {
     try {
@@ -39,7 +44,7 @@ function App() {
         {/* Tất cả các trang nội dung phải nằm trong cặp thẻ này */}
         <Route element={<DefaultLayout />}>
             
-            {/* Trang chủ */}
+            {/* Trang chủu */}
             <Route path="/" element={<Home />} />
             
             {/* Chi tiết công thức & Tạo mới */}
@@ -53,6 +58,9 @@ function App() {
             <Route path="/mon-chinh" element={<Maincourse />} />
             <Route path="/mien-nam" element={<Southern />} />
             <Route path="/mien-bac" element={<North />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:id" element={<PostDetail />} />
+            <Route path="/create-post" element={<CreatePost />} />
         </Route>
          {/* Nhóm trang Admin */}
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>

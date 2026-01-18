@@ -4,7 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
+
 use App\Http\Controllers\UserController;
+
+
+use App\Http\Controllers\PostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +34,17 @@ Route::get('/admin/users', [UserController::class, 'index']);
 Route::post('/recipes', [RecipeController::class, 'store']);
 // Route cần đăng nhập mới vào được (Test token)
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+
+Route::get('/posts', [PostController::class, 'index']);
+// Route::post('/posts', [PostController::class, 'store']);
+Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'show']);
+ Route::post('/recipes', [RecipeController::class, 'store']);
+
+// Các API cần đăng nhập (Phải có Token mới vào được)
+Route::middleware('auth:sanctum')->group(function () { 
+    
+    // API Đăng bài nằm trong này mới lấy được auth()->id()
+    Route::post('/posts', [PostController::class, 'store']); 
+    
+});
+

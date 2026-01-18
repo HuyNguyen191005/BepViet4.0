@@ -4,8 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
+
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +29,13 @@ Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
+
+
+Route::post('/recipes', [RecipeController::class, 'store']);
+// Route cần đăng nhập mới vào được (Test token)
+Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+
+
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
 // Route::post('/posts', [PostController::class, 'store']);
@@ -39,3 +50,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reviews', [ReviewController::class, 'store']);
     
 });
+
+
+Route::get('/admin/users', [UserController::class, 'index']);
+// api.php
+// Thêm các route sau dưới route lấy danh sách user
+Route::put('/admin/users/{id}', [UserController::class, 'update']); // Sửa thông tin
+Route::patch('/admin/users/{id}/status', [UserController::class, 'toggleStatus']); // Khóa/Mở khóa
+Route::delete('/admin/users/{id}', [UserController::class, 'destroy']); // Xóa tài khoản
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);

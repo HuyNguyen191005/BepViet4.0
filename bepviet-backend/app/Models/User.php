@@ -24,6 +24,7 @@ class User extends Authenticatable
         'full_name',
         'avatar',
         'role',
+        'status',
     ];
 
     // 3. Ẩn các cột nhạy cảm khi trả về API

@@ -11,30 +11,63 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // 1. Khai báo tên bảng và khóa chính
-    protected $table = 'users';
-    protected $primaryKey = 'user_id'; 
-    public $incrementing = true;
+    protected $table = 'users';      // Tên bảng
+    protected $primaryKey = 'user_id'; // Khóa chính tùy chỉnh (thay vì id)
 
-    // 2. Các cột được phép thêm dữ liệu
+    // Các cột được phép thêm/sửa (Mass Assignment)
     protected $fillable = [
-        'username',
-        'email',
-        'password_hash', // Lưu ý: tên cột trong DB của bạn
-        'full_name',
-        'avatar',
-        'role',
+        'username', 
+        'email', 
+        'password_hash', 
+        'full_name', 
+        'avatar', 
+        'cover_image', // Thêm cột ảnh bìa
+        'bio',         // Thêm cột giới thiệu
+        'role'
     ];
 
-    // 3. Ẩn các cột nhạy cảm khi trả về API
+    // Các cột bị ẩn khi trả về JSON (Bảo mật)
     protected $hidden = [
-        'password_hash',
+        'password_hash', 
         'remember_token',
     ];
 
-    // 4. Quan trọng: Chỉ định cột mật khẩu cho Laravel biết
+    // Định dạng dữ liệu tự động
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+    
+    // --- CẤU HÌNH AUTHENTICATION ---
+
+    // Laravel mặc định tìm cột 'password', ta trỏ nó về 'password_hash'
     public function getAuthPassword()
     {
         return $this->password_hash;
     }
+
+    // --- CÁC MỐI QUAN HỆ (RELATIONSHIPS) ---
+
+    // 1. Một User có nhiều công thức nấu ăn (Recipes)
+    public function recipes()
+    {
+        // tham số 2: khóa ngoại bên bảng recipes (user_id)
+        // tham số 3: khóa chính bên bảng users (user_id)
+        return $this->hasMany(Recipe::class, 'user_id', 'user_id');
+    }
+
+    // 2. Một User có thể viết nhiều đánh giá (Reviews)
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'user_id', 'user_id');
+    }
+    // app/Models/User.php
+public function favorites()
+{
+    return $this->belongsToMany(Recipe::class, 'favorites', 'user_id', 'recipe_id')->withTimestamps();
+}
+
+public function collections()
+{
+    return $this->hasMany(Collection::class, 'user_id');
+}
 }

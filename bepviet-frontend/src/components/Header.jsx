@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+// ⚠️ QUAN TRỌNG: Hãy đảm bảo bạn có file 'default-avatar.png' trong thư mục public
+const DEFAULT_AVATAR = 'avt1.jpg'; 
+
 export default function Header() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [keyword, setKeyword] = useState('');
 
-    // Kiểm tra đăng nhập
+    // --- 1. KHỞI TẠO & KIỂM TRA ĐĂNG NHẬP ---
     useEffect(() => {
         const userStr = localStorage.getItem('USER_INFO');
         if (userStr) {
-            setUser(JSON.parse(userStr));
+            try {
+                setUser(JSON.parse(userStr));
+            } catch (error) {
+                console.error("Lỗi dữ liệu user:", error);
+                localStorage.removeItem('USER_INFO');
+            }
         }
     }, []);
 
+    // --- 2. CÁC HÀM XỬ LÝ SỰ KIỆN ---
     const handleCreateClick = () => {
-        // Chuyển hướng sang trang tạo công thức
         navigate('/create-recipe');
     };
 
@@ -33,26 +41,36 @@ export default function Header() {
         }
     };
 
-    // --- HÀM XỬ LÝ LINK ẢNH AVATAR (MỚI THÊM) ---
+    // --- 3. XỬ LÝ ĐƯỜNG DẪN ẢNH (LOGIC QUAN TRỌNG) ---
     const getAvatarUrl = (imageName) => {
-        // 1. Nếu không có tên ảnh -> Trả về ảnh mặc định trong thư mục public
-        if (!imageName) return '/default-avatar.png'; 
+        // Nếu không có tên ảnh -> Dùng ảnh mặc định
+        if (!imageName) return DEFAULT_AVATAR;
         
-        // 2. Nếu là link online (Google/FB) -> Giữ nguyên
-        if (imageName.startsWith('http')) return imageName;
+        // Nếu là link online (Google/Facebook/Cloudinary) -> Giữ nguyên
+        if (imageName.startsWith('http') || imageName.startsWith('data:')) {
+            return imageName;
+        }
 
-        // 3. Nếu là file từ DB -> Nối domain backend vào
-        return `http://localhost:8000/storage/${imageName}`; 
+        // Nếu là ảnh trong thư mục Public
+        // Luôn thêm dấu '/' ở đầu để thành đường dẫn tuyệt đối (Absolute Path)
+        // Điều này giúp ảnh hiển thị đúng kể cả khi đang ở trang con (vd: /recipes/1)
+        return imageName.startsWith('/') ? imageName : `/${imageName}`;
+    };
+
+    // Xử lý khi ảnh bị lỗi (404) -> Thay thế ngay bằng ảnh mặc định
+    const handleImageError = (e) => {
+        e.target.onerror = null; 
+        e.target.src = DEFAULT_AVATAR;
     };
 
     return (
         <header className="header-container">
             <div className="header-wrapper">
                 
-                {/* 1. LOGO */}
+                {/* LOGO */}
                 <div className="header-left">
                     <Link to="/" className="logo-link">
-                        <img src="/logo.png" alt="Logo" className="logo-img" />
+                        <img src="/logo.png" alt="Bếp Việt Logo" className="logo-img" />
                         <div className="logo-text">
                             <span className="brand-name">BẾP VIỆT</span>
                             <span className="brand-version">4.0</span>
@@ -60,7 +78,7 @@ export default function Header() {
                     </Link>
                 </div>
 
-                {/* 2. MENU GIỮA */}
+                {/* MENU */}
                 <nav className="header-center">
                     <Link to="/" className="nav-item active">Trang chủ</Link>
                     <Link to="/recipes" className="nav-item">Công thức</Link>
@@ -68,10 +86,8 @@ export default function Header() {
                     <Link to="/blog" className="nav-item">Blog</Link>
                 </nav>
 
-                {/* 3. KHU VỰC TÌM KIẾM & USER */}
+                {/* SEARCH & USER */}
                 <div className="header-right">
-                    
-                    {/* Ô tìm kiếm bo tròn */}
                     <div className="search-box">
                         <span className="search-icon">🔍</span>
                         <input 
@@ -83,29 +99,39 @@ export default function Header() {
                         />
                     </div>
 
-                    {/* Logic User */}
                     {user ? (
                         <div className="user-actions">
-                            {/* Nút Đăng bài */}
                             <button className="btn-upload" onClick={handleCreateClick}>
                                 + Đăng bài
                             </button>
 
-                            {/* Avatar & Tên */}
                             <div className="user-profile">
-                                {/* --- SỬA THẺ IMG TẠI ĐÂY --- */}
-                                <img 
-                                    src={getAvatarUrl(user.avatar || user.image)} 
-                                    alt="Avatar" 
-                                    className="user-avatar" 
-                                    onError={(e) => {
-                                        e.target.onerror = null; 
-                                        e.target.src = '/default-avatar.png'; // Ảnh dự phòng khi lỗi
-                                    }}
-                                />
+                                <Link to="/profile" className="profile-link-wrapper" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', marginRight: '8px' }}>
+                                    <img 
+                                        // Kiểm tra tất cả các trường có thể chứa tên ảnh trong DB
+                                        src={getAvatarUrl(user.avatar || user.image || user.image_url)} 
+                                        alt="User Avatar"
+                                        className="user-avatar" 
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            cursor: 'pointer',
+                                            border: '1px solid #ddd',
+                                            backgroundColor: '#f5f5f5'
+                                        }} 
+                                        onError={handleImageError}
+                                    />
+                                </Link>
+
                                 <div className="user-dropdown">
-                                    <span className="user-name">Chào, {user.full_name}</span>
-                                    <button onClick={handleLogout} className="logout-text">Đăng xuất</button>
+                                    <span className="user-name">
+                                        Chào, {user.full_name || user.name || "Bạn"}
+                                    </span>
+                                    <button onClick={handleLogout} className="logout-text">
+                                        Đăng xuất
+                                    </button>
                                 </div>
                             </div>
                         </div>

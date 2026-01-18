@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
-
+use App\Http\Controllers\Api\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,3 +29,12 @@ Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory'
  Route::post('/recipes', [RecipeController::class, 'store']);
 // Route cần đăng nhập mới vào được (Test token)
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
+// Nhóm các API liên quan đến User
+Route::get('/profile/{id}', [ProfileController::class, 'show']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/recipes/{id}/favorite', [FavoriteController::class, 'toggleFavorite']);
+    Route::get('/my-favorites', [FavoriteController::class, 'getMyFavorites']);
+    
+    // Route cho Collections (Cơ bản)
+    Route::resource('collections', CollectionController::class);
+});

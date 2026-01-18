@@ -23,4 +23,9 @@ class Post extends Model
         'thumbnail', // Tên cột ảnh trong DB của bạn
         'type'
     ];
+    public function user()
+    {
+        // 'user_id' là khóa ngoại trong bảng posts liên kết với id trong bảng users
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

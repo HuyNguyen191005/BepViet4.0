@@ -9,17 +9,8 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CommentController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
 // Route công khai
 Route::post('/login', [AuthController::class, 'login']);
@@ -29,7 +20,7 @@ Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/categories', [RecipeController::class, 'getCategories']); // API lấy danh mục cho sidebar
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
-
+Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
 
 Route::post('/recipes', [RecipeController::class, 'store']);
 // Route cần đăng nhập mới vào được (Test token)
@@ -48,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Đăng bài nằm trong này mới lấy được auth()->id()
     Route::post('/posts', [PostController::class, 'store']); 
     Route::post('/reviews', [ReviewController::class, 'store']);
-    
+    Route::post('/comments', [CommentController::class, 'store']);
 });
 
 

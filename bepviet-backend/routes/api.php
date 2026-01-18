@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ReviewController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +26,7 @@ Route::get('/categories', [RecipeController::class, 'getCategories']); // API l�
 Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi tiết 1 món
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
 Route::get('/posts', [PostController::class, 'index']);
+Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
 // Route::post('/posts', [PostController::class, 'store']);
 Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'show']);
  Route::post('/recipes', [RecipeController::class, 'store']);
@@ -34,5 +36,6 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // API Đăng bài nằm trong này mới lấy được auth()->id()
     Route::post('/posts', [PostController::class, 'store']); 
+    Route::post('/reviews', [ReviewController::class, 'store']);
     
 });

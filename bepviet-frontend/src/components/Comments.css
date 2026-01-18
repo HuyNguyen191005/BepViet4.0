@@ -1,0 +1,254 @@
+/* Comments.css - Full Version for Nested Comments */
+
+/* --- KHUNG BAO NGOÀI --- */
+.comments-wrapper {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Bóng đổ nhẹ */
+    margin-top: 30px;
+}
+
+.comments-header {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+/* --- FORM NHẬP LIỆU CHÍNH (TO) --- */
+.comment-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.rating-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.rating-label {
+    font-weight: 600;
+    margin-right: 15px;
+    color: #555;
+}
+
+.star-icon {
+    transition: transform 0.2s, color 0.2s;
+}
+
+.star-icon:hover {
+    transform: scale(1.2);
+}
+
+.comment-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.comment-textarea:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.btn-submit {
+    margin-top: 12px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #e68900;
+}
+
+.btn-submit:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* --- LOGIN PROMPT --- */
+.login-prompt {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+}
+
+.login-link {
+    color: #ff9800;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+/* --- DANH SÁCH BÌNH LUẬN (CẬP NHẬT CHO ĐA CẤP) --- */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Container cho mỗi bình luận (bao gồm cả Cha và Con) */
+.comment-item {
+    display: block; /* Đổi từ flex sang block để chứa được con bên dưới */
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+/* Phần hiển thị nội dung chính (Của cha) */
+.comment-main {
+    display: flex; /* Dùng flex ở đây để avatar nằm cạnh nội dung */
+    gap: 15px;
+}
+
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Không cho avatar bị co lại */
+}
+
+.comment-body {
+    flex: 1;
+}
+
+.comment-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.comment-author {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.comment-stars {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.comment-text {
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.5;
+}
+
+.no-comments {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* --- CÁC STYLE MỚI CHO TÍNH NĂNG ĐA CẤP (QUAN TRỌNG) --- */
+
+/* 1. Nút "Trả lời" */
+.btn-reply {
+    background: none;
+    border: none;
+    color: #ff9800;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.btn-reply:hover {
+    text-decoration: underline;
+    color: #e68900;
+}
+
+/* 2. Form trả lời (Nhỏ hơn form chính) */
+.reply-form-container {
+    margin-top: 15px;
+    margin-left: 65px; /* Thụt vào thẳng hàng với chữ của comment cha */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.reply-textarea {
+    height: 60px; /* Ngắn hơn form chính */
+    font-size: 0.9rem;
+}
+
+.btn-cancel {
+    background: none;
+    border: none;
+    color: #777;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-cancel:hover {
+    color: #333;
+}
+
+/* 3. Danh sách bình luận con (Children List) */
+.children-list {
+    margin-top: 15px;
+    margin-left: 35px; /* Thụt đầu dòng so với cha */
+    padding-left: 20px;
+    border-left: 3px solid #f0f0f0; /* Đường kẻ dọc chỉ dẫn */
+}
+
+/* Item con */
+.child-item {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #fafafa; /* Nền xám nhẹ để phân biệt với cha */
+}
+
+/* Avatar con (Nhỏ hơn cha) */
+.child-avatar {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #ddd;
+}
+
+/* Hiệu ứng hiện form */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
+import Comments from '../components/Comments'; // <-- 1. Import Component Bình luận
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -24,9 +25,11 @@ const RecipeDetail = () => {
 
     const mainImage = recipe.image_url && recipe.image_url !== 'logo.png' ? recipe.image_url : '/default-food.jpg';
 
-    // Tính điểm trung bình rating
-    const totalRating = recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0);
-    const avgRating = recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
+    // Tính điểm trung bình rating (Hiển thị ở Header)
+    // Lưu ý: Số liệu này lấy từ lần tải trang đầu tiên
+    const totalRating = recipe.reviews ? recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0) : 0;
+    const avgRating = recipe.reviews && recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
+    const reviewCount = recipe.reviews ? recipe.reviews.length : 0;
 
     return (
         <div style={{background: '#f8f9fa', minHeight: '100vh', paddingBottom: '50px'}}>
@@ -39,7 +42,6 @@ const RecipeDetail = () => {
                 <span style={{fontSize:'13px', color:'#888'}}>
                     <Link to="/" style={{color:'#888', textDecoration:'none'}}>Trang chủ</Link> 
                     {' / '}
-                    {/* Giả sử đường dẫn trang món chay là /mon-chay */}
                     <Link to="/mon-chay" style={{color:'#888', textDecoration:'none'}}>Món Chay</Link> 
                     {' / '}
                     <b>{recipe.title}</b>
@@ -51,14 +53,14 @@ const RecipeDetail = () => {
                 
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                        <img src={recipe.author?.avatar && recipe.author.avatar !== 'logo.png' ? recipe.author.avatar : '/default-avatar.png'} style={{width:'40px', height:'40px', borderRadius:'50%'}} />
+                        <img src={recipe.author?.avatar && recipe.author.avatar !== 'logo.png' ? recipe.author.avatar : '/default-avatar.png'} style={{width:'40px', height:'40px', borderRadius:'50%'}} alt="Avatar" />
                         <div>
                             <div style={{fontSize:'13px', color:'#666'}}>Đăng bởi: <b>{recipe.author?.full_name}</b></div>
                             <div style={{fontSize:'12px', color:'#999'}}>Ngày: {new Date(recipe.created_at).toLocaleDateString()}</div>
                         </div>
                     </div>
                     <div>
-                        <span style={{color:'#f59e0b', fontSize:'18px'}}>★ {avgRating} ({recipe.reviews.length} đánh giá)</span>
+                        <span style={{color:'#f59e0b', fontSize:'18px'}}>★ {avgRating} ({reviewCount} đánh giá)</span>
                     </div>
                 </div>
 
@@ -73,7 +75,7 @@ const RecipeDetail = () => {
                 <div className="detail-desc">"{recipe.description}"</div>
 
                 <div className="detail-content">
-                    {/* CỘT NGUYÊN LIỆU (Lấy từ bảng ingredients + recipe_ingredients) */}
+                    {/* CỘT NGUYÊN LIỆU */}
                     <div className="ingredients-box">
                         <div className="ing-header">🛒 NGUYÊN LIỆU</div>
                         <button className="btn-add-cart">+ Thêm vào giỏ</button>
@@ -92,64 +94,42 @@ const RecipeDetail = () => {
                         </div>
                     </div>
 
-{/* CỘT CÁCH LÀM (Lấy từ bảng steps) */}
-<div className="steps-box">
-    <div className="ing-header">📝 CÁCH LÀM</div>
-    
-    {recipe.steps && recipe.steps.length > 0 ? (
-        recipe.steps.map((step) => (
-            <div key={step.step_id} className="step-item">
-                <div className="step-title">Bước {step.step_order}</div>
-                <p style={{fontSize:'15px', lineHeight:'1.6'}}>{step.content}</p>
-                
-                {/* --- PHẦN SỬA ĐỔI: Hiển thị ảnh với đường dẫn đầy đủ --- */}
-                {step.image_url && (
-                    <img 
-                        // 👇 QUAN TRỌNG: Ghép domain server + storage + tên file
-                    src={step.image_url}
+                    {/* CỘT CÁCH LÀM */}
+                    <div className="steps-box">
+                        <div className="ing-header">📝 CÁCH LÀM</div>
                         
-                        className="step-img" 
-                        alt={`Step ${step.step_order}`} 
-                        
-                        // Thêm chút style để ảnh gọn gàng, không bị tràn khung
-                        style={{
-                            marginTop: '10px', 
-                            maxWidth: '100%', 
-                            height: 'auto',
-                            borderRadius: '8px', 
-                            display: 'block'
-                        }}
-                    />
-                )}
-                {/* ------------------------------------------------------- */}
-                
-            </div>
-        ))
-    ) : (
-        <p>Chưa có hướng dẫn cụ thể cho món này.</p>
-    )}
-</div>
+                        {recipe.steps && recipe.steps.length > 0 ? (
+                            recipe.steps.map((step) => (
+                                <div key={step.step_id} className="step-item">
+                                    <div className="step-title">Bước {step.step_order}</div>
+                                    <p style={{fontSize:'15px', lineHeight:'1.6'}}>{step.content}</p>
+                                    
+                                    {step.image_url && (
+                                        <img 
+                                            src={step.image_url}
+                                            className="step-img" 
+                                            alt={`Step ${step.step_order}`} 
+                                            style={{
+                                                marginTop: '10px', 
+                                                maxWidth: '100%', 
+                                                height: 'auto',
+                                                borderRadius: '8px', 
+                                                display: 'block'
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <p>Chưa có hướng dẫn cụ thể cho món này.</p>
+                        )}
+                    </div>
                 </div>
 
-                {/* BÌNH LUẬN (Lấy từ bảng reviews) */}
-                <div className="review-section">
-                    <h3>Đánh giá từ cộng đồng ({recipe.reviews.length})</h3>
-                    {recipe.reviews && recipe.reviews.map(review => (
-                        <div key={review.review_id} className="review-card">
-                            <img src={review.user?.avatar || '/default-avatar.png'} style={{width:'50px', height:'50px', borderRadius:'50%'}} />
-                            <div style={{width:'100%'}}>
-                                <div style={{display:'flex', justifyContent:'space-between'}}>
-                                    <div style={{fontWeight:'bold'}}>{review.user?.full_name}</div>
-                                    <span style={{color:'#f59e0b'}}>★ {review.rating}</span>
-                                </div>
-                                <div style={{fontSize:'12px', color:'#999', marginBottom:'5px'}}>
-                                    {new Date(review.created_at).toLocaleDateString()}
-                                </div>
-                                <p style={{fontSize:'14px'}}>{review.content}</p>
-                            </div>
-                        </div>
-                    ))}
-                    {recipe.reviews.length === 0 && <p style={{color:'#666', fontStyle:'italic'}}>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>}
+                {/* --- PHẦN BÌNH LUẬN MỚI --- */}
+                {/* Thay thế code cũ bằng Component Comments */}
+                <div className="review-section" style={{marginTop: '40px'}}>
+                    <Comments recipeId={id} />
                 </div>
 
             </div>

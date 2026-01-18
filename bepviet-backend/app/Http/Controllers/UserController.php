@@ -22,7 +22,30 @@ class UserController extends Controller
         return response()->json($user);
     }
     public function index() {
-        return User::all(); // Hoặc User::paginate(10);
+        // Sử dụng where để chỉ lấy những người dùng có role là 'User'
+        $users = User::where('role', 'User')->get(); 
+
+        return response()->json($users);
+    }
+    // UserController.php
+    public function update(Request $request, $id) {
+        $user = User::findOrFail($id);
+        $user->update($request->only(['full_name', 'email', 'role', 'status']));
+        return response()->json(['message' => 'Cập nhật thành công', 'user' => $user]);
+    }
+
+    public function toggleStatus($id) {
+        $user = User::findOrFail($id);
+        // Đảo ngược trạng thái giữa 'active' và 'locked'
+        $user->status = ($user->status === 'active' || $user->status === '') ? 'locked' : 'active';
+        $user->save();
+        return response()->json(['message' => 'Cập nhật trạng thái thành công', 'user' => $user]);
+    }
+
+    public function destroy($id) {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return response()->json(['message' => 'Xóa tài khoản thành công']);
     }
 }
 

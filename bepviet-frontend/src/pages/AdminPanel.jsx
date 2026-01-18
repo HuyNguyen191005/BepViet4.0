@@ -37,7 +37,41 @@ const AdminPanel = () => {
         user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+    
+    const handleDelete = (id) => {
+        if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này không?")) {
+            axiosClient.delete(`/admin/users/${id}`)
+                .then(() => {
+                    alert("Đã xóa người dùng");
+                    setUsers(users.filter(u => u.user_id !== id)); // Cập nhật danh sách local
+                })
+                .catch(err => alert("Lỗi khi xóa: " + err.message));
+        }
+    };
+    
+    const handleToggleStatus = (id) => {
+        axiosClient.patch(`/admin/users/${id}/status`)
+            .then((res) => {
+                alert(res.data.message);
+                // Cập nhật lại user cụ thể trong state
+                setUsers(users.map(u => u.user_id === id ? res.data.user : u));
+            })
+            .catch(err => alert("Lỗi cập nhật trạng thái: " + err.message));
+    };
+    
+    // Chức năng sửa (Ví dụ dùng prompt đơn giản, bạn có thể tạo Modal sau)
+    const handleEdit = (user) => {
+        const newName = prompt("Nhập tên mới:", user.full_name);
+        if (newName) {
+            axiosClient.put(`/admin/users/${user.user_id}`, { ...user, full_name: newName })
+                .then((res) => {
+                    alert("Đã sửa thông tin");
+                    setUsers(users.map(u => u.user_id === user.user_id ? res.data.user : u));
+                })
+                .catch(err => alert("Lỗi khi sửa: " + err.message));
+        }
+    };
+    
     if (loading) return <div className="admin-page-content">Đang tải dữ liệu người dùng...</div>;
 
     return (
@@ -96,11 +130,14 @@ const AdminPanel = () => {
                                             </span>
                                         </td>
                                         <td className="action-buttons">
-                                            <button className="edit-btn" title="Sửa">📝</button>
-                                            <button className="lock-btn" title={user.status === 'locked' ? 'Mở khóa' : 'Khóa'}>
+                                            <button className="edit-btn" title="Sửa" onClick={() => handleEdit(user)}>📝</button>
+                                            <button 
+                                                className="lock-btn" 
+                                                title={user.status === 'locked' ? 'Mở khóa' : 'Khóa'} 
+                                                onClick={() => handleToggleStatus(user.user_id)}>
                                                 {user.status === 'locked' ? '🔓' : '🚫'}
                                             </button>
-                                            <button className="delete-btn" title="Xóa">🗑️</button>
+                                            <button className="delete-btn" title="Xóa" onClick={() => handleDelete(user.user_id)}>🗑️</button>
                                         </td>
                                     </tr>
                                 ))}

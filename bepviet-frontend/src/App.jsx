@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css'
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,8 +14,19 @@ import North from './pages/North';
 import SearchResults from './pages/SearchResults';
 import DefaultLayout from './components/DefaultLayout';
 import CreateRecipe from './pages/CreateRecipe';
-
+import AdminLayout from './pages/AdminLayout';
+import AdminPanel from './pages/AdminPanel';
 function App() {
+  const getUserInfo = () => {
+    try {
+      const stored = localStorage.getItem('USER_INFO');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const user = getUserInfo();
   return (
     <BrowserRouter>
       <Routes>
@@ -23,7 +34,7 @@ function App() {
         {/* --- NHÓM 1: CÁC TRANG KHÔNG CẦN HEADER/FOOTER (Login, Register) --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        
         {/* --- NHÓM 2: CÁC TRANG CÓ HEADER & FOOTER (Dùng DefaultLayout) --- */}
         {/* Tất cả các trang nội dung phải nằm trong cặp thẻ này */}
         <Route element={<DefaultLayout />}>
@@ -42,9 +53,14 @@ function App() {
             <Route path="/mon-chinh" element={<Maincourse />} />
             <Route path="/mien-nam" element={<Southern />} />
             <Route path="/mien-bac" element={<North />} />
-            
         </Route>
-
+         {/* Nhóm trang Admin */}
+        <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
+        {/* Trang mặc định khi vào /admin là Tổng quan */}
+        {/* <Route index element={<AdminDashboard />} />  */}
+        {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
+        <Route path="users" element={<AdminPanel />} /> 
+        </Route>
       </Routes>
     </BrowserRouter>
   );

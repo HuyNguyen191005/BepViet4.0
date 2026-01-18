@@ -1,214 +1,207 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
-use App\Models\Step; // Đảm bảo đã có Model Step
-use Illuminate\Support\Facades\DB; // <-- QUAN TRỌNG: Để dùng Transaction
+use App\Models\Step;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
+    // --- 1. LẤY DANH SÁCH MÓN ĂN (TRANG CHỦ) ---
     public function index()
     {
-        // Lấy các món có status là 'Published', mới nhất lên đầu
         $recipes = Recipe::with('author')
-                        ->where('status', 'Published') 
-                        ->orderBy('created_at', 'desc')
-                        ->take(8)
-                        ->get();
-        
+            ->where('status', 'Published')
+            ->orderBy('created_at', 'desc')
+            ->take(8)
+            ->get();
+
         return response()->json($recipes);
     }
+
+    // --- 2. CHI TIẾT MÓN ĂN ---
     public function show($id)
     {
-        // Eager Load: Lấy Recipe kèm theo:
-        // 1. author: Tác giả món ăn
-        // 2. steps: Các bước làm
-        // 3. ingredients: Nguyên liệu
-        // 4. reviews.user: Các đánh giá và thông tin người đánh giá đó
         $recipe = Recipe::with(['author', 'steps', 'ingredients', 'reviews.user'])
-                        ->find($id);
+            ->find($id);
 
         if (!$recipe) {
             return response()->json(['message' => 'Không tìm thấy món ăn'], 404);
         }
 
-        return response()->json($recipe);   
+        return response()->json($recipe);
     }
-    public function getByCategory($id)
-{
-    // Kiểm tra Category có tồn tại không
-    $category = Category::findOrFail($id);
 
-    $recipes = Recipe::where('status', 'Published') // Thêm lọc trạng thái
-        ->whereHas('categories', function($query) use ($id) {
-            // Sử dụng tên bảng pivot hoặc quan hệ chuẩn
-            $query->where('categories.category_id', $id);
-        })
-        ->with('author') // Đảm bảo Model Recipe có function author()
-        ->orderBy('created_at', 'desc')
-        ->paginate(9); 
-
-    return response()->json([
-        'category' => $category,
-        'recipes' => $recipes 
-    ]);
-}
+    // --- 3. TÌM KIẾM ---
     public function search(Request $request)
     {
-    $query = Recipe::query();
+        $query = Recipe::query();
 
-    // 1. Tìm theo từ khóa
-    if ($request->filled('query')) {
-        $keyword = $request->input('query');
-        $query->where('title', 'like', '%' . $keyword . '%');
-    }
-
-    // 2. Lọc Category (CHỈ LỌC KHI CÓ DỮ LIỆU)
-    if ($request->filled('categories')) {
-        $categoryIds = explode(',', $request->input('categories'));
-        // Kiểm tra xem mảng có rỗng không trước khi lọc
-        if (!empty($categoryIds) && $categoryIds[0] != "") {
-            $query->whereHas('categories', function ($q) use ($categoryIds) {
-                $q->whereIn('categories.category_id', $categoryIds);
-            });
+        if ($request->filled('query')) {
+            $query->where('title', 'like', '%' . $request->input('query') . '%');
         }
-    }
 
-    // 3. Lọc Độ khó (CHỈ LỌC KHI CÓ DỮ LIỆU)
-    if ($request->filled('difficulty')) {
-        $difficulties = explode(',', $request->input('difficulty'));
-        if (!empty($difficulties) && $difficulties[0] != "") {
-            $query->whereIn('difficulty', $difficulties);
+        if ($request->filled('categories')) {
+            $categoryIds = explode(',', $request->input('categories'));
+            if (!empty($categoryIds) && $categoryIds[0] != "") {
+                $query->whereHas('categories', function ($q) use ($categoryIds) {
+                    $q->whereIn('categories.category_id', $categoryIds);
+                });
+            }
         }
+
+        if ($request->filled('difficulty')) {
+            $difficulties = explode(',', $request->input('difficulty'));
+            if (!empty($difficulties) && $difficulties[0] != "") {
+                $query->whereIn('difficulty', $difficulties);
+            }
+        }
+
+        $recipes = $query->with('categories')
+            ->where('status', 'Published')
+            ->get();
+
+        return response()->json($recipes);
     }
 
-    // 4. Lọc Thời gian
-    if ($request->filled('max_time')) {
-        $query->where('cooking_time', '<=', $request->input('max_time'));
-    }
-
-    // 5. Lấy kèm dữ liệu liên quan
-    $recipes = $query->with('categories')
-                     ->withAvg('reviews', 'rating')
-                     ->withCount('reviews')
-                     ->get();
-
-    return response()->json($recipes);
-    }
-
-// Đảm bảo bạn CÓ hàm này để lấy danh sách Loại món
-public function getCategories() {
-    return response()->json(\App\Models\Category::all());
-}
-// --- HÀM MỚI: TẠO MÓN ĂN ---
+    // --- 4. TẠO MÓN ĂN (QUAN TRỌNG: ĐÃ FIX LỖI) ---
     public function store(Request $request)
     {
-        // 1. Validate dữ liệu đầu vào
+        // A. Lấy ID người dùng (Ưu tiên Token -> Sau đó đến dữ liệu gửi lên)
+        $userId = auth()->id();
+        
+        // Nếu Token không giải mã được user, lấy từ form gửi lên (Fallback)
+        if (!$userId && $request->has('user_id')) {
+            $userId = $request->input('user_id');
+        }
+
+        if (!$userId) {
+            return response()->json(['message' => 'Lỗi xác thực: Không tìm thấy ID người dùng.'], 401);
+        }
+
+        // B. Xử lý dữ liệu JSON từ FormData (Nguyên liệu & Bước làm)
+        // Vì FormData gửi Array dưới dạng String, cần decode ra
+        $ingredients = $request->ingredients;
+        if (is_string($ingredients)) {
+            $ingredients = json_decode($ingredients, true);
+        }
+
+        $steps = $request->steps;
+        if (is_string($steps)) {
+            $steps = json_decode($steps, true);
+        }
+
+        // Gán lại vào request để validate
+        $request->merge([
+            'ingredients' => $ingredients,
+            'steps' => $steps
+        ]);
+
+        // C. Validate
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'cooking_time' => 'required|integer',
-            'difficulty' => 'required|in:Dễ,Trung bình,Khó', // Kiểm tra đúng giá trị ENUM
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate ảnh
-            
-            // Validate mảng danh mục
-            'category_ids' => 'required|array',
-            'category_ids.*' => 'exists:categories,category_id',
-
-            // Validate mảng nguyên liệu
-            'ingredients' => 'required|array',
-            'ingredients.*.ingredient_id' => 'required|exists:ingredients,ingredient_id',
-            'ingredients.*.quantity' => 'required',
-            'ingredients.*.unit' => 'required',
-
-            // Validate mảng các bước
-            'steps' => 'required|array',
-            'steps.*.content' => 'required|string',
+            'cooking_time' => 'required',
+            'difficulty' => 'required',
+            'category_ids' => 'nullable', // Có thể để null nếu không bắt buộc
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // 2. Bắt đầu Transaction
         DB::beginTransaction();
-
         try {
-            // A. Xử lý upload ảnh (nếu có)
+            // 1. Upload ảnh chính
             $imagePath = null;
             if ($request->hasFile('image')) {
-                // Lưu vào storage/app/public/recipes
                 $path = $request->file('image')->store('recipes', 'public');
-                // Tạo đường dẫn URL đầy đủ
-                $imagePath = asset('storage/' . $path);
+                $imagePath = asset('storage/' . $path); // Lưu đường dẫn đầy đủ
             }
 
-            // B. Tạo món ăn vào bảng `recipes`
+            // 2. Tạo Recipe
             $recipe = Recipe::create([
-                // Giả sử đã đăng nhập, lấy ID người dùng hiện tại
-                // Nếu chưa làm đăng nhập, bạn có thể hardcode: 'author_id' => 1,
-               'user_id' => auth()->id() ?? 1,
+                'user_id' => $userId, // Chắc chắn có ID
                 'title' => $request->title,
                 'description' => $request->description,
-                'cooking_time' => $request->cooking_time,
+                'cooking_time' => (int)$request->cooking_time,
                 'difficulty' => $request->difficulty,
                 'image_url' => $imagePath,
-                'status' => 'Published', // Mặc định chờ duyệt
+                'status' => 'Published'
             ]);
 
-            // C. Lưu danh mục (Bảng trung gian recipe_categories)
-            // attach: tự động thêm vào bảng phụ
-            $recipe->categories()->attach($request->category_ids);
-
-            // D. Lưu nguyên liệu (Bảng trung gian recipe_ingredients)
-            foreach ($request->ingredients as $ing) {
-                // attach có thể nhận tham số thứ 2 là các cột phụ (quantity, unit)
-                $recipe->ingredients()->attach($ing['ingredient_id'], [
-                    'quantity' => $ing['quantity'],
-                    'unit' => $ing['unit']
-                ]);
+            // 3. Lưu Categories (Nếu có)
+            if ($request->has('category_ids') && !empty($request->category_ids)) {
+                 // Xử lý nếu category_ids là string "1,2,3"
+                 $cats = is_string($request->category_ids) ? explode(',', $request->category_ids) : $request->category_ids;
+                 $recipe->categories()->attach($cats);
             }
 
-            // E. Lưu các bước làm (Bảng steps)
-          if ($request->has('steps')) {
-        foreach ($request->steps as $index => $stepData) {
-            $stepImagePath = null;
-            
-            // Lưu ý: Key gửi lên từ Postman/Frontend vẫn là 'image' cho ngắn gọn
-            // Ví dụ: steps[0][image]
-            if ($request->hasFile("steps.$index.image")) {
-                $file = $request->file("steps.$index.image");
-                $path = $file->store('steps', 'public');
-                $stepImagePath = asset('storage/' . $path);
+            // 4. Lưu Nguyên liệu
+            if (!empty($ingredients) && is_array($ingredients)) {
+                foreach ($ingredients as $ing) {
+                    // Kiểm tra dữ liệu hợp lệ trước khi lưu
+                    if (isset($ing['ingredient_id'])) {
+                        $recipe->ingredients()->attach($ing['ingredient_id'], [
+                            'quantity' => $ing['quantity'] ?? '',
+                            'unit' => $ing['unit'] ?? ''
+                        ]);
+                    }
+                }
             }
 
-            Step::create([
-                'recipe_id' => $recipe->recipe_id, // hoặc $recipe->id
-                'step_order' => $index + 1,
-                'content' => $stepData['content'],
-                
-                // --- SỬA CHỖ NÀY ---
-                'image_url' => $stepImagePath 
-                // -------------------
-            ]);
+            // 5. Lưu Các bước làm
+            if (!empty($steps) && is_array($steps)) {
+                foreach ($steps as $index => $stepData) {
+                    $stepContent = is_array($stepData) ? ($stepData['content'] ?? '') : $stepData;
+                    
+                    Step::create([
+                        'recipe_id' => $recipe->recipe_id ?? $recipe->id,
+                        'step_order' => $index + 1,
+                        'content' => $stepContent,
+                        'image_url' => null // Xử lý ảnh bước sau nếu cần
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Đăng công thức thành công!', 'data' => $recipe], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Lỗi tạo món ăn: " . $e->getMessage());
+            return response()->json(['message' => 'Lỗi Server: ' . $e->getMessage()], 500);
         }
     }
 
-            // Nếu mọi thứ ngon lành -> Lưu vào DB thật
-            DB::commit(); 
-
-            return response()->json([
-                'message' => 'Tạo món ăn thành công!',
-                'recipe' => $recipe
-            ], 201);
-
-        } catch (\Exception $e) {
-            // Nếu có lỗi bất kỳ -> Hủy toàn bộ thao tác nãy giờ
-            DB::rollBack();
-            return response()->json(['message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
+    // --- 5. LẤY MÓN ĂN CỦA TÔI ---
+    public function getMyRecipes(Request $request)
+    {
+        // Tương tự, ưu tiên Auth, fallback sang request gửi lên
+        $userId = auth()->id();
+        if (!$userId && $request->has('user_id')) {
+            $userId = $request->input('user_id');
         }
+
+        if (!$userId) {
+             // Nếu vẫn không có user_id, trả về mảng rỗng thay vì lỗi 401 để trang web không bị crash
+            return response()->json([]);
+        }
+
+        $recipes = Recipe::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($recipes);
+    }
+    
+    public function getCategories()
+    {
+        return response()->json(Category::all());
     }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-// ⚠️ QUAN TRỌNG: Hãy đảm bảo bạn có file 'default-avatar.png' trong thư mục public
+
 const DEFAULT_AVATAR = 'avt1.jpg'; 
 
 export default function Header() {

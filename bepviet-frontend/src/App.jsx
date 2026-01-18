@@ -57,7 +57,7 @@ function App() {
             <Route path="/create-recipe" element={<CreateRecipe />} />
             <Route path="/search" element={<SearchResults />} />
 
-            {/* Các trang danh mục (Đưa hết vào đây mới có Header/Footer) */}
+            {/* Các trang danh mục (Đưa vào đây mới có Header/Footer) */}
             <Route path="/an-sang" element={<Havebreakfast />} />
             <Route path="/trang-mieng" element={<Dessert />} />
             <Route path="/mon-chinh" element={<Maincourse />} />

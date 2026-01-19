@@ -36,10 +36,17 @@ Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () { 
     
     // API Đăng bài nằm trong này mới lấy được auth()->id()
+    
+    Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/posts', [PostController::class, 'store']); 
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::post('/comments', [CommentController::class, 'store']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user/profile', [UserController::class, 'getProfile']);
+        Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
+        // ... các route khác ...
+    });
 });
 
 
@@ -51,3 +58,11 @@ Route::patch('/admin/users/{id}/status', [UserController::class, 'toggleStatus']
 Route::delete('/admin/users/{id}', [UserController::class, 'destroy']); // Xóa tài khoản
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index']);
+Route::get('/admin/recipes', [RecipeController::class, 'getAdminRecipes']);
+
+// Route duyệt bài (Cập nhật status sang 'Published')
+Route::patch('/admin/recipes/{id}/approve', [RecipeController::class, 'approve']); 
+// Route xóa bài
+Route::delete('/admin/recipes/{id}', [RecipeController::class, 'destroy']);
+// Thêm route thay đổi trạng thái bài viết
+Route::patch('/admin/recipes/{id}/status', [RecipeController::class, 'toggleStatus']);

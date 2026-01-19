@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
+use App\Models\Activity;
 use App\Models\Step; // Đảm bảo đã có Model Step
 use Illuminate\Support\Facades\DB; // <-- QUAN TRỌNG: Để dùng Transaction
 use Illuminate\Support\Facades\Validator;
@@ -155,7 +156,8 @@ public function getCategories() {
                 'cooking_time' => $request->cooking_time,
                 'difficulty' => $request->difficulty,
                 'image_url' => $imagePath,
-                'status' => 'Published', // Mặc định chờ duyệt
+                'status'       => 'Draft',             
+                'views'        => 0,
             ]);
 
             // C. Lưu danh mục (Bảng trung gian recipe_categories)
@@ -195,10 +197,15 @@ public function getCategories() {
             ]);
         }
     }
-
+            Activity::create([
+                'user_id'  => auth()->id(),
+                'username' => auth()->user()->full_name,
+                'action'   => 'vừa đăng một công thức mới: ' . $recipe->title,
+                'type'     => 'recipe' // Loại là recipe để Admin dễ phân loại
+            ]);
             // Nếu mọi thứ ngon lành -> Lưu vào DB thật
-            DB::commit(); 
-
+            DB::commit();
+            
             return response()->json([
                 'message' => 'Tạo món ăn thành công!',
                 'recipe' => $recipe
@@ -209,5 +216,55 @@ public function getCategories() {
             DB::rollBack();
             return response()->json(['message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
         }
+    }
+
+        public function getAdminRecipes()
+    {
+        // Đổi 'author' thành 'user' nếu bạn chưa định nghĩa hàm author() trong Model Recipe
+        $recipes = Recipe::with(['author', 'categories']) 
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return response()->json($recipes);
+    }
+
+    public function approve($id)
+    {
+        $recipe = Recipe::findOrFail($id);
+        
+        // Cập nhật trạng thái thành Published (Đã duyệt)
+        $recipe->status = 'Published';
+        $recipe->save();
+
+        // Trả về dữ liệu đã cập nhật kèm thông tin liên quan để Frontend hiển thị lại
+        return response()->json($recipe->load(['author', 'categories']));
+    }
+    public function destroy($id) {
+        $recipe = Recipe::findOrFail($id);
+        $recipe->delete();
+        return response()->json(['message' => 'Đã xóa công thức thành công']);
+    }
+    
+    public function toggleStatus($id)
+    {
+        $recipe = Recipe::findOrFail($id);
+        
+        // Đảo ngược trạng thái: Nếu đang 'Published' thì về 'Draft' và ngược lại
+        $recipe->status = ($recipe->status === 'Published') ? 'Draft' : 'Published';
+        $recipe->save();
+    
+        // Trả về dữ liệu đã cập nhật kèm thông tin author và categories
+        return response()->json($recipe->load(['author','categorise']));
+    }
+
+    public function toggleFavorite($id) {
+        $user = auth()->user();
+        // toggle() sẽ tự động thêm nếu chưa có, xóa nếu đã có trong bảng favorites
+        $status = $user->favorites()->toggle($id);
+        
+        return response()->json([
+            'is_favorited' => count($status['attached']) > 0,
+            'message' => 'Cập nhật bộ sưu tập thành công'
+        ]);
     }
 }

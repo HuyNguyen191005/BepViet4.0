@@ -38,4 +38,8 @@ class User extends Authenticatable
     {
         return $this->password_hash;
     }
+    public function favorites() {
+        return $this->belongsToMany(Recipe::class, 'favorites', 'user_id', 'recipe_id');
+        
+    }
 }

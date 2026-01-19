@@ -24,7 +24,9 @@ import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
 
 import AdminDashboard from './pages/AdminDashboard';
+import AdminRecipePanel from './pages/AdminRecipePanel';
 
+import UserProfile from './components/UserProfile';
 
 function App() {
   const getUserInfo = () => {
@@ -68,16 +70,23 @@ function App() {
             <Route path="/blog/:id" element={<PostDetail />} />
             <Route path="/create-post" element={<CreatePost />} />
 
-
+            {/* Thêm vào trong nhóm Route của DefaultLayout để có Header/Footer */}
+            <Route index element={<Home />} />
+            <Route path="/profile" element={<UserProfile />} /> {/* DÒNG CẦN THÊM */}
+                {/* ... các route khác ... */}
         </Route>
-         {/* Nhóm trang Admin */}
+          {/* Nhóm trang Admin */}
+          <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
+          {/* Trang mặc định khi vào /admin là Tổng quan */}
+          <Route index element={<AdminDashboard />} />  
+          {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
+          <Route path="users" element={<AdminPanel />} /> 
+          // Trong nhóm Route Admin
+        </Route>
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
-        {/* Trang mặc định khi vào /admin là Tổng quan */}
-        <Route index element={<AdminDashboard />} />  
-        {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
-        <Route path="users" element={<AdminPanel />} /> 
-        
-        
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminPanel />} />
+              <Route path="recipes" element={<AdminRecipePanel />} /> {/* THÊM DÒNG NÀY */}
         </Route>
       </Routes>
     </BrowserRouter>

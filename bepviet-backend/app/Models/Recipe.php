@@ -11,7 +11,7 @@ class Recipe extends Model
 
     protected $table = 'recipes';
     protected $primaryKey = 'recipe_id'; // Khóa chính của bạn
-
+    public $timestamps = false;
   protected $fillable = [
         'title',
         'description',
@@ -66,4 +66,5 @@ class Recipe extends Model
         // Giả sử ảnh lưu trong public/images
         return asset('images/' . $this->image_url);
     }
+   
 }

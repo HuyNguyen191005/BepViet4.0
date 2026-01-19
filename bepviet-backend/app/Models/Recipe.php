@@ -25,7 +25,7 @@ class Recipe extends Model
     ];
 
     // 1. Quan hệ với người đăng (User)
-    public function author()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }

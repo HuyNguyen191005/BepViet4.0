@@ -28,8 +28,16 @@ const RecipeCard = ({ recipe }) => {
                 
 
                 <div className="recipe-author">
-                    <img className="author-avatar" src={recipe.author?.avatar || '/default-avatar.png'} alt="" />
-                    <span style={{fontWeight:'500'}}>{recipe.author?.full_name || 'Đầu bếp ẩn danh'}</span>
+                   <img 
+       src={recipe.user?.avatar ? `http://localhost:8000/storage/${recipe.user.avatar}` : '...link_avatar_mac_dinh...'} 
+       alt="avatar" style={{
+        width: '30px',      // Kích thước cố định
+        height: '30px',     // Kích thước cố định
+        borderRadius: '50%', // Bo tròn
+        objectFit: 'cover',  // Cắt ảnh vừa khung, không bị méo
+        marginRight: '8px'
+    }}/>
+                    <span style={{fontWeight:'500'}}>{recipe.user?.full_name || 'Đầu bếp ẩn danh'}</span>
                     {/* Nút tim yêu thích giả lập */}
                     <span style={{marginLeft:'auto', color:'#ddd', cursor:'pointer'}}>❤</span>
                 </div>

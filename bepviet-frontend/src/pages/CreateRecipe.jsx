@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { Trash2, Upload, Plus, Camera } from "lucide-react";
+// 1. Thay axios thường bằng axiosClient đã cấu hình
+import axiosClient from "../api/axiosClient"; // Sửa đường dẫn nếu cần
+import { Trash2, Upload, Plus, Camera, Loader } from "lucide-react";
 
 const CreateRecipe = () => {
   const [formData, setFormData] = useState({
@@ -29,38 +30,30 @@ const CreateRecipe = () => {
     { content: "", image_file: null, image_preview: null }
   ]);
 
+  // Thêm state loading để khóa nút khi đang gửi
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
-    // --- 2. THÊM DỮ LIỆU GIẢ LẬP CHO DANH MỤC ---
+    // Dữ liệu giả lập (Sau này bạn có thể gọi API lấy danh mục thật ở đây)
     setCategories([
-      { id: 1, name: "Món sáng" },
-      { id: 2, name: "Món chính" },
-      { id: 3, name: "Ăn vặt" },
-      { id: 4, name: "Đồ uống" },
-      { id: 5, name: "Bánh ngọt" },
-      { id: 6, name: "Healthy/Diet" },
+      { id: 1, name: "Món sáng" }, { id: 2, name: "Món chính" },
+      { id: 3, name: "Ăn vặt" }, { id: 4, name: "Đồ uống" },
+      { id: 5, name: "Bánh ngọt" }, { id: 6, name: "Healthy/Diet" },
     ]);
 
-    // Giả lập nguyên liệu
     setAvailableIngredients([
-      { id: 1, name: "Thịt bò" },
-      { id: 2, name: "Thịt gà" },
-      { id: 3, name: "Trứng gà" },
-      { id: 4, name: "Cà chua" },
-      { id: 5, name: "Hành tây" },
-      { id: 6, name: "Bánh phở" },
+      { id: 1, name: "Thịt bò" }, { id: 2, name: "Thịt gà" },
+      { id: 3, name: "Trứng gà" }, { id: 4, name: "Cà chua" },
+      { id: 5, name: "Hành tây" }, { id: 6, name: "Bánh phở" },
     ]);
   }, []);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // --- 3. HÀM XỬ LÝ CHỌN DANH MỤC (CHECKBOX) ---
   const handleCategoryChange = (catId) => {
     setSelectedCategories(prev => {
-      if (prev.includes(catId)) {
-        return prev.filter(id => id !== catId); // Bỏ chọn
-      } else {
-        return [...prev, catId]; // Chọn thêm
-      }
+      if (prev.includes(catId)) return prev.filter(id => id !== catId);
+      return [...prev, catId];
     });
   };
 
@@ -107,22 +100,25 @@ const CreateRecipe = () => {
     setSteps([...steps, { content: "", image_file: null, image_preview: null }]);
   };
 
+  // --- HÀM SUBMIT QUAN TRỌNG ĐÃ SỬA ---
   const handleSubmit = async (statusType) => {
-    // --- 4. KIỂM TRA ĐÃ CHỌN DANH MỤC CHƯA ---
+    // Validate cơ bản
     if (selectedCategories.length === 0) {
-        alert("Vui lòng chọn ít nhất 1 danh mục cho món ăn!");
+        alert("Vui lòng chọn ít nhất 1 danh mục!");
         return;
     }
-// Kiểm tra thời gian nấu
     if (!formData.cooking_time) {
-        alert("Bạn quên nhập Thời gian nấu rồi!");
+        alert("Vui lòng nhập thời gian nấu!");
         return;
     }
-    // ---Kiểm tra ảnh đại diện ---
     if (!mainImage) {
-        alert("Vui lòng chọn Ảnh đại diện cho món ăn!");
+        alert("Vui lòng chọn ảnh đại diện!");
         return;
     }
+
+    // Bắt đầu loading
+    setIsLoading(true);
+
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
@@ -131,11 +127,9 @@ const CreateRecipe = () => {
     data.append("servings", formData.servings);
     data.append("status", statusType);
     
-    // Hardcode user_id để test:
-    data.append("user_id", 1); 
+    // --- QUAN TRỌNG: Đã xóa dòng user_id ---
+    // data.append("user_id", 1); // <--- ĐÃ XÓA: Để Backend tự lấy từ Token
 
-    // --- 5. GỬI DANH SÁCH DANH MỤC LÊN SERVER ---
-    // Laravel yêu cầu dạng category_ids[] để nhận diện là mảng
     selectedCategories.forEach(catId => {
         data.append("category_ids[]", catId);
     });
@@ -145,7 +139,6 @@ const CreateRecipe = () => {
     }
 
     ingredients.forEach((ing, index) => {
-      // Chỉ gửi nguyên liệu nếu đã chọn tên
       if (ing.ingredient_id) {
           data.append(`ingredients[${index}][ingredient_id]`, ing.ingredient_id);
           data.append(`ingredients[${index}][quantity]`, ing.quantity);
@@ -161,16 +154,33 @@ const CreateRecipe = () => {
     });
 
     try {
-      await axios.post("http://localhost:8000/api/recipes", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      // 2. Sử dụng axiosClient thay vì axios thường
+      // Không cần truyền base URL (vì axiosClient đã có)
+      // Không cần truyền Token thủ công (vì axiosClient tự gắn)
+      const response = await axiosClient.post("/recipes", data, {
+        headers: { 
+            "Content-Type": "multipart/form-data" // Bắt buộc khi upload file
+        },
       });
+
       alert("Thành công! Món ăn đã được tạo.");
-      // Có thể thêm navigate('/') để về trang chủ
+      // Redirect hoặc Reset form tại đây nếu muốn
+      
     } catch (error) {
       console.error(error);
-      // Hiển thị lỗi chi tiết từ Laravel nếu có
-      const serverError = error.response?.data?.message || error.message;
-      alert("Lỗi: " + serverError);
+      const serverError = error.response?.data?.message || "Có lỗi xảy ra";
+      // Nếu có lỗi validation chi tiết
+      const validationErrors = error.response?.data?.errors;
+      if(validationErrors) {
+          // Lấy lỗi đầu tiên để hiển thị
+          const firstError = Object.values(validationErrors)[0][0];
+          alert(`Lỗi: ${firstError}`);
+      } else {
+          alert(`Lỗi: ${serverError}`);
+      }
+    } finally {
+        // Tắt loading dù thành công hay thất bại
+        setIsLoading(false);
     }
   };
 
@@ -178,60 +188,32 @@ const CreateRecipe = () => {
     <div className="cr-container">
       <h1 className="cr-page-title">Đăng Công Thức Mới</h1>
 
-      {/* --- PHẦN 1: THÔNG TIN CHUNG --- */}
+      {/* PHẦN 1: THÔNG TIN CHUNG */}
       <div className="cr-section">
-        <h2 className="cr-section-title">
-          <span>ℹ️</span> THÔNG TIN CHUNG
-        </h2>
+        <h2 className="cr-section-title"><span>ℹ️</span> THÔNG TIN CHUNG</h2>
 
         <div className="cr-form-group">
           <label className="cr-label">Tiêu đề món ăn <span className="cr-required">*</span></label>
-          <input
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="VD: Phở bò gia truyền..."
-            className="cr-input"
-          />
+          <input name="title" value={formData.title} onChange={handleChange} placeholder="VD: Phở bò gia truyền..." className="cr-input" />
         </div>
 
         <div className="cr-form-group">
           <label className="cr-label">Mô tả ngắn</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Mô tả sự hấp dẫn của món ăn..."
-            className="cr-textarea"
-            rows="3"
-          />
+          <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Mô tả sự hấp dẫn..." className="cr-textarea" rows="3" />
         </div>
 
-        {/* --- 6. GIAO DIỆN CHỌN DANH MỤC --- */}
         <div className="cr-form-group">
-            <label className="cr-label">Danh mục món ăn <span className="cr-required">*</span></label>
+            <label className="cr-label">Danh mục <span className="cr-required">*</span></label>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {categories.map(cat => (
-                    <label 
-                        key={cat.id} 
-                        style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: '6px', 
-                            cursor: 'pointer',
-                            background: selectedCategories.includes(cat.id) ? '#e0f2fe' : '#f3f4f6',
-                            padding: '8px 12px',
-                            borderRadius: '20px',
-                            border: selectedCategories.includes(cat.id) ? '1px solid #0ea5e9' : '1px solid #e5e7eb',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        <input 
-                            type="checkbox" 
-                            checked={selectedCategories.includes(cat.id)}
-                            onChange={() => handleCategoryChange(cat.id)}
-                            style={{ accentColor: '#0ea5e9' }}
-                        />
+                    <label key={cat.id} style={{ 
+                        display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer',
+                        background: selectedCategories.includes(cat.id) ? '#e0f2fe' : '#f3f4f6',
+                        padding: '8px 12px', borderRadius: '20px',
+                        border: selectedCategories.includes(cat.id) ? '1px solid #0ea5e9' : '1px solid #e5e7eb',
+                        transition: 'all 0.2s'
+                    }}>
+                        <input type="checkbox" checked={selectedCategories.includes(cat.id)} onChange={() => handleCategoryChange(cat.id)} style={{ accentColor: '#0ea5e9' }} />
                         <span style={{ fontSize: '14px', fontWeight: 500 }}>{cat.name}</span>
                     </label>
                 ))}
@@ -281,114 +263,63 @@ const CreateRecipe = () => {
 
       <div style={{height: '30px'}}></div>
 
-      {/* --- PHẦN 2: NGUYÊN LIỆU --- */}
+      {/* PHẦN 2: NGUYÊN LIỆU */}
       <div className="cr-section">
-        <h2 className="cr-section-title">
-          <span>🥕</span> NGUYÊN LIỆU
-        </h2>
-        
+        <h2 className="cr-section-title"><span>🥕</span> NGUYÊN LIỆU</h2>
         <div>
-            <div className="cr-table-header">
-                <div className="cr-col-1">Tên nguyên liệu</div>
-                <div className="cr-col-2">Số lượng</div>
-                <div className="cr-col-3">Đơn vị</div>
-                <div className="cr-col-4"></div>
-            </div>
-
             {ingredients.map((ing, index) => (
                 <div key={index} className="cr-row">
                     <div className="cr-col-1">
-                        <select 
-                            className="cr-select"
-                            value={ing.ingredient_id}
-                            onChange={(e) => handleIngredientChange(index, 'ingredient_id', e.target.value)}
-                        >
+                        <select className="cr-select" value={ing.ingredient_id} onChange={(e) => handleIngredientChange(index, 'ingredient_id', e.target.value)}>
                             <option value="">-- Chọn --</option>
-                            {availableIngredients.map(item => (
-                                <option key={item.id} value={item.id}>{item.name}</option>
-                            ))}
+                            {availableIngredients.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
                         </select>
                     </div>
                     <div className="cr-col-2">
-                        <input 
-                            type="number" 
-                            className="cr-input"
-                            value={ing.quantity}
-                            onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)}
-                        />
+                        <input type="number" className="cr-input" value={ing.quantity} onChange={(e) => handleIngredientChange(index, 'quantity', e.target.value)} />
                     </div>
                     <div className="cr-col-3">
-                          <select 
-                            className="cr-select"
-                            value={ing.unit}
-                            onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                        >
-                            <option>Gram</option>
-                            <option>Kg</option>
-                            <option>Muỗng</option>
-                            <option>Trái</option>
-                            <option>ml</option>
-                            <option>Lít</option>
+                          <select className="cr-select" value={ing.unit} onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}>
+                            <option>Gram</option><option>Kg</option><option>Muỗng</option><option>Trái</option><option>ml</option><option>Lít</option>
                         </select>
                     </div>
                     <div className="cr-col-4">
-                        <button className="cr-btn-del" onClick={() => removeIngredientRow(index)}>
-                            <Trash2 size={18} />
-                        </button>
+                        <button className="cr-btn-del" onClick={() => removeIngredientRow(index)}><Trash2 size={18} /></button>
                     </div>
                 </div>
             ))}
         </div>
-
-        <button onClick={addIngredientRow} className="cr-btn-add">
-            <Plus size={18} style={{marginRight: '8px'}} /> THÊM NGUYÊN LIỆU
-        </button>
+        <button onClick={addIngredientRow} className="cr-btn-add"><Plus size={18} style={{marginRight: '8px'}} /> THÊM NGUYÊN LIỆU</button>
       </div>
 
       <div style={{height: '30px'}}></div>
 
-      {/* --- PHẦN 3: CÁCH LÀM --- */}
+      {/* PHẦN 3: CÁCH LÀM */}
       <div className="cr-section">
-        <h2 className="cr-section-title">
-          <span>📝</span> CÁCH LÀM (STEPS)
-        </h2>
-
+        <h2 className="cr-section-title"><span>📝</span> CÁCH LÀM (STEPS)</h2>
         {steps.map((step, index) => (
             <div key={index} className="cr-step-item">
                 <div className="cr-step-title">BƯỚC {index + 1}</div>
-                <textarea 
-                    className="cr-textarea"
-                    placeholder={`Mô tả chi tiết bước ${index + 1}...`}
-                    rows="3"
-                    value={step.content}
-                    onChange={(e) => handleStepChange(index, e.target.value)}
-                ></textarea>
-                
+                <textarea className="cr-textarea" placeholder={`Mô tả bước ${index + 1}...`} rows="3" value={step.content} onChange={(e) => handleStepChange(index, e.target.value)}></textarea>
                 <div className="cr-step-upload">
                     <label className="cr-upload-btn-text">
-                        <Camera size={18} style={{marginRight: '6px'}} />
-                        Thêm ảnh
+                        <Camera size={18} style={{marginRight: '6px'}} /> Thêm ảnh
                         <input type="file" style={{display:'none'}} onChange={(e) => handleStepImageChange(index, e)} />
                     </label>
-                    {step.image_preview && (
-                        <img src={step.image_preview} alt="Step" className="cr-step-img-preview" />
-                    )}
+                    {step.image_preview && <img src={step.image_preview} alt="Step" className="cr-step-img-preview" />}
                 </div>
             </div>
         ))}
-
-        <button onClick={addStepRow} className="cr-btn-add">
-            <Plus size={18} style={{marginRight: '8px'}} /> THÊM BƯỚC LÀM
-        </button>
+        <button onClick={addStepRow} className="cr-btn-add"><Plus size={18} style={{marginRight: '8px'}} /> THÊM BƯỚC LÀM</button>
       </div>
 
-      {/* --- FOOTER --- */}
+      {/* FOOTER - DISABLE KHI ĐANG LOADING */}
       <div className="cr-footer">
-        <button onClick={() => handleSubmit('Draft')} className="cr-btn-draft">
-            LƯU NHÁP
+        <button onClick={() => handleSubmit('Draft')} className="cr-btn-draft" disabled={isLoading}>
+            {isLoading ? 'Đang lưu...' : 'LƯU NHÁP'}
         </button>
-        <button onClick={() => handleSubmit('Published')} className="cr-btn-publish">
-            ĐĂNG CÔNG THỨC ✓
+        <button onClick={() => handleSubmit('Published')} className="cr-btn-publish" disabled={isLoading}>
+            {isLoading ? <span style={{display:'flex', alignItems:'center', gap:'5px'}}><Loader className="animate-spin" size={16}/> ĐANG XỬ LÝ...</span> : 'ĐĂNG CÔNG THỨC ✓'}
         </button>
       </div>
     </div>

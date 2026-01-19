@@ -12,23 +12,21 @@ class RecipeController extends Controller
 {
     public function index()
     {
-        // Lấy các món có status là 'Published', mới nhất lên đầu
-        $recipes = Recipe::with('author')
+        // Sửa 'author' thành 'user'
+        $recipes = Recipe::with('user') 
                         ->where('status', 'Published') 
                         ->orderBy('created_at', 'desc')
-                        ->take(8)
+                        ->take(8) // Lấy 8 món mới nhất
                         ->get();
         
         return response()->json($recipes);
     }
+
     public function show($id)
     {
-        // Eager Load: Lấy Recipe kèm theo:
-        // 1. author: Tác giả món ăn
-        // 2. steps: Các bước làm
-        // 3. ingredients: Nguyên liệu
-        // 4. reviews.user: Các đánh giá và thông tin người đánh giá đó
-        $recipe = Recipe::with(['author', 'steps', 'ingredients', 'reviews.user'])
+        // Sửa 'author' thành 'user'
+        // Các quan hệ khác giữ nguyên
+        $recipe = Recipe::with(['user', 'steps', 'ingredients', 'reviews.user'])
                         ->find($id);
 
         if (!$recipe) {
@@ -150,7 +148,8 @@ public function getCategories() {
             $recipe = Recipe::create([
                 // Giả sử đã đăng nhập, lấy ID người dùng hiện tại
                 // Nếu chưa làm đăng nhập, bạn có thể hardcode: 'author_id' => 1,
-               'user_id' => auth()->id() ?? 1,
+               // Sửa dòng này:
+                'user_id' => auth()->id(),
                 'title' => $request->title,
                 'description' => $request->description,
                 'cooking_time' => $request->cooking_time,

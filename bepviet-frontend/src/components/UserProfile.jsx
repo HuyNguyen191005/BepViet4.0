@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
-import './UserProfile.css';
+import './UserProfile.css'; // Đảm bảo bạn có file css này
 import { 
     User, BookOpen, Heart, ShoppingCart, Settings, 
-    LogOut, Clock, Trash2, CheckCircle, Eye, Calendar, Edit 
-} from 'lucide-react'; // Đã thêm icon Edit
+    LogOut, Trash2, Eye, Calendar, Edit 
+} from 'lucide-react';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ const UserProfile = () => {
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // --- 1. LẤY DỮ LIỆU USER ---
     useEffect(() => {
         const token = localStorage.getItem('ACCESS_TOKEN');
         if (!token) return navigate('/login');
@@ -23,116 +24,112 @@ const UserProfile = () => {
                 setUserData(res.data);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                setLoading(false);
+                // navigate('/login'); // Có thể mở lại nếu muốn strict mode
+            });
     }, [navigate]);
 
-    // --- HÀM XỬ LÝ URL ẢNH ---
+    // --- 2. HÀM XỬ LÝ URL ẢNH (Quan trọng) ---
     const getImageUrl = (url) => {
         if (!url) return '';
-        if (url.startsWith('http')) {
-            return url;
-        }
+        if (url.startsWith('http')) return url;
         return `http://localhost:8000/storage/${url}`;
     };
 
-    // --- 1. XỬ LÝ XÓA BÀI VIẾT CỦA TÔI ---
-    const handleDeleteRecipe = async (recipeId) => {
-        // Hỏi xác nhận trước khi xóa
-        if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.")) {
-            return;
-        }
+    // --- 3. CÁC CHỨC NĂNG HÀNH ĐỘNG ---
 
-        try {
-            // Gọi API xóa
-            await axiosClient.delete(`/recipes/${recipeId}`);
-            
-            // Nếu thành công, cập nhật lại State để UI tự biến mất bài đó mà không cần F5
-            setUserData(prev => ({
-                ...prev,
-                recipes: prev.recipes.filter(r => r.recipe_id !== recipeId),
-                recipes_count: prev.recipes_count - 1
-            }));
-            
-            alert("Đã xóa bài viết thành công.");
-        } catch (error) {
-            console.error(error);
-            alert("Lỗi khi xóa: " + (error.response?.data?.message || "Lỗi server"));
-        }
-    };
-
-    // --- 2. XỬ LÝ CHUYỂN TRANG SỬA ---
+    // A. Chuyển hướng sang trang Sửa
     const handleEditRecipe = (recipeId) => {
         navigate(`/recipes/edit/${recipeId}`);
     };
 
-    // --- 3. XỬ LÝ XÓA YÊU THÍCH (BỘ SƯU TẬP) ---
-    const handleRemoveFavorite = (recipeId) => {
-        if(window.confirm('Bạn có chắc muốn xóa khỏi bộ sưu tập?')) {
-            // Logic gọi API xóa yêu thích (Cần bổ sung API backend cho phần này sau)
-            console.log("Xóa recipe id khỏi fav:", recipeId);
+    // B. Xử lý xóa bài viết (Phân loại logic dựa trên Filter hiện tại)
+    const handleRecipeActionDelete = async (recipeId) => {
+        // TRƯỜNG HỢP 1: Đang ở Thùng rác -> Xóa vĩnh viễn
+        if (recipeFilter === 'trash') {
+            if (!window.confirm("CẢNH BÁO: Bài viết sẽ bị xóa vĩnh viễn không thể khôi phục!")) return;
             
-            // Cập nhật UI giả lập
-            setUserData(prev => ({
-                ...prev,
-                favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId)
-            }));
+            try {
+                await axiosClient.delete(`/recipes/${recipeId}`);
+                // Cập nhật UI
+                setUserData(prev => ({
+                    ...prev,
+                    recipes: prev.recipes.filter(r => r.recipe_id !== recipeId)
+                }));
+                alert("Đã xóa vĩnh viễn!");
+            } catch (error) {
+                alert("Lỗi khi xóa vĩnh viễn: " + (error.response?.data?.message || "Lỗi Server"));
+            }
+        } 
+        // TRƯỜNG HỢP 2: Đang ở Tất cả/Chờ duyệt -> Chuyển vào thùng rác (Soft Delete)
+        else {
+            if (!window.confirm("Bạn muốn chuyển bài viết này vào thùng rác?")) return;
+
+            try {
+                await axiosClient.patch(`/recipes/${recipeId}/trash`);
+                // Cập nhật UI: Xóa khỏi danh sách hiện tại
+                setUserData(prev => ({
+                    ...prev,
+                    recipes: prev.recipes.filter(r => r.recipe_id !== recipeId),
+                    recipes_count: prev.recipes_count - 1
+                }));
+                alert("Đã chuyển vào thùng rác!");
+            } catch (error) {
+                alert("Lỗi khi xóa tạm: " + (error.response?.data?.message || "Lỗi Server"));
+            }
         }
     };
 
+    // C. Xử lý Bỏ yêu thích (Xóa khỏi bộ sưu tập)
+    const handleRemoveFavorite = async (recipeId) => {
+        if (!window.confirm("Bạn có muốn bỏ món ăn này khỏi bộ sưu tập?")) return;
+
+        try {
+            // Gọi API toggle favorite (hoặc delete favorite tùy backend)
+            await axiosClient.post(`/recipes/${recipeId}/favorite`); 
+            
+            // Cập nhật UI
+            setUserData(prev => ({
+                ...prev,
+                favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId),
+                favorites_count: (prev.favorites_count || 1) - 1
+            }));
+        } catch (err) {
+            alert("Lỗi khi bỏ yêu thích: " + err.message);
+        }
+    };
+
+    // D. Đăng xuất
     const handleLogout = () => {
         localStorage.removeItem('ACCESS_TOKEN');
         localStorage.removeItem('USER_INFO');
         navigate('/login');
         window.location.reload();
     };
-    // --- HÀM XỬ LÝ XÓA CÔNG THỨC (CHUYỂN VÀO THÙNG RÁC) ---
-    const handleMoveToTrash = async (recipeId) => {
-        if (window.confirm("CẢNH BÁO: Bài viết sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?")) {
-            try {
-                await axiosClient.patch(`/recipes/${recipeId}/trash`); 
-                
-                // XÓA KHỎI DANH SÁCH: Lọc bỏ bài viết vừa xóa ra khỏi mảng recipes
-                setUserData(prev => ({
-                    ...prev,
-                    recipes: prev.recipes.filter(r => r.recipe_id !== recipeId), // Xóa hẳn khỏi giao diện
-                    recipes_count: prev.recipes_count - 1 // Giảm con số tổng bài viết trên dashboard
-                }));
-    
-                alert("Đã xóa bài viết vĩnh viễn!");
-            } catch (err) {
-                alert("Không thể xóa bài viết.");
-            }
-        }
-    };
-    // --- HÀM XỬ LÝ BỎ YÊU THÍCH ---
-    const handleRemoveFavorite = async (recipeId) => {
-        if (window.confirm("Bạn có muốn bỏ món ăn này khỏi bộ sưu tập?")) {
-            try {
-                // SỬA TẠI ĐÂY: Gọi API favorite thay vì trash
-                await axiosClient.post(`/recipes/${recipeId}/favorite`); 
-                
-                // Cập nhật lại giao diện ngay lập tức
-                setUserData(prev => ({
-                    ...prev,
-                    favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId),
-                    favorites_count: (prev.favorites_count || 1) - 1
-                }));
-                alert("Đã bỏ khỏi bộ sưu tập!");
-            } catch (err) {
-                alert("Lỗi khi bỏ yêu thích.");
-            }
-        }
-    };
+
     if (loading) return <div className="loading">Đang tải dữ liệu...</div>;
 
     return (
         <div className="profile-container">
-            {/* --- SIDEBAR TRÁI: THÔNG TIN CÁ NHÂN --- */}
+            {/* --- SIDEBAR TRÁI --- */}
             <aside className="profile-sidebar">
                 <div className="user-info-box">
-                    <div className="user-avatar-large">
-                        <User size={50} />
+                    {/* AVATAR: Đã sửa để hiển thị ảnh thật */}
+                    <div className="user-avatar-large relative w-24 h-24 mx-auto mb-4">
+                        {userData?.user?.avatar_url ? (
+                            <img 
+                                src={getImageUrl(userData.user.avatar_url)} 
+                                alt={userData.user.full_name}
+                                className="w-full h-full rounded-full object-cover border-2 border-gray-100 shadow-sm"
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-gray-200 rounded-full flex items-center justify-center">
+                                <User size={50} className="text-gray-500"/>
+                            </div>
+                        )}
                     </div>
+                    
                     <h3 className="user-display-name">{userData?.user.full_name}</h3>
                     <p className="user-display-email">{userData?.user.email}</p>
                     <div className="user-join-date">
@@ -160,7 +157,7 @@ const UserProfile = () => {
                 </nav>
             </aside>
 
-            {/* --- NỘI DUNG CHÍNH --- */}
+            {/* --- MAIN CONTENT --- */}
             <main className="profile-main-content">
                 
                 {/* 1. TAB QUẢN LÝ CÔNG THỨC */}
@@ -168,11 +165,11 @@ const UserProfile = () => {
                     <div className="tab-content">
                         <div className="stats-bar">
                             <div className="stat-item">
-                                <div className="stat-value">{userData?.recipes_count}</div>
+                                <div className="stat-value">{userData?.recipes_count || 0}</div>
                                 <div className="stat-label">Bài viết</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-value">{userData?.total_views}</div>
+                                <div className="stat-value">{userData?.total_views || 0}</div>
                                 <div className="stat-label">Lượt xem</div>
                             </div>
                             <div className="stat-item">
@@ -188,15 +185,16 @@ const UserProfile = () => {
                         </div>
 
                         <div className="recipe-list-container">
-                            {userData?.recipes
+                            {userData?.recipes && userData.recipes.length > 0 ? (
+                                userData.recipes
                                 .filter(r => {
                                     if (recipeFilter === 'pending') return r.status === 'Draft';
                                     if (recipeFilter === 'trash') return r.status === 'Deleted';
+                                    // Mặc định 'all' là lấy những bài chưa xóa
                                     return r.status !== 'Deleted';
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
-                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img src={getImageUrl(recipe.image_url)} alt={recipe.title} />
                                         
                                         <div className="recipe-info">
@@ -210,13 +208,34 @@ const UserProfile = () => {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="recipe-meta">
-                                            <span><Eye size={14} /> {recipe.views}</span>
-                                            <button className="btn-icon-trash"><Trash2 size={16} /></button>
+
+                                        {/* BUTTON ACTIONS */}
+                                        <div className="recipe-meta flex flex-col gap-2">
+                                            {/* Nút Sửa: Chỉ hiện khi không ở trong thùng rác */}
+                                            {recipeFilter !== 'trash' && (
+                                                <button 
+                                                    className="btn-icon-edit text-blue-500 hover:bg-blue-50 p-2 rounded"
+                                                    onClick={() => handleEditRecipe(recipe.recipe_id)}
+                                                    title="Chỉnh sửa bài viết"
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                            )}
+                                            
+                                            {/* Nút Xóa */}
+                                            <button 
+                                                className="btn-icon-trash text-red-500 hover:bg-red-50 p-2 rounded"
+                                                onClick={() => handleRecipeActionDelete(recipe.recipe_id)}
+                                                title={recipeFilter === 'trash' ? "Xóa vĩnh viễn" : "Chuyển vào thùng rác"}
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))
-                            }
+                            ) : (
+                                <p className="text-center text-gray-500 mt-10">Chưa có bài viết nào.</p>
+                            )}
                         </div>
                     </div>
                 )}
@@ -229,31 +248,41 @@ const UserProfile = () => {
                         </h2>
                         
                         <div className="favorite-list">
-                            {userData?.favorite_recipes?.map(recipe => (
-                                <div key={recipe.recipe_id} className="favorite-horizontal-card">
-                                    <div className="favorite-left-group">
-                                        <img 
-                                            src={`http://localhost:8000/storage/${recipe.image_url}`} 
-                                            alt={recipe.title} 
-                                            onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
-                                        />
-                                        <div className="favorite-info">
-                                            <h4 onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}>
-                                                {recipe.title}
-                                            </h4>
-                                            <span className="favorite-date">Đã lưu: {new Date(recipe.created_at).toLocaleDateString('vi-VN')}</span>
+                            {userData?.favorite_recipes?.length > 0 ? (
+                                userData.favorite_recipes.map(recipe => (
+                                    <div key={recipe.recipe_id} className="favorite-horizontal-card">
+                                        <div className="favorite-left-group">
+                                            <img 
+                                                src={getImageUrl(recipe.image_url)} 
+                                                alt={recipe.title} 
+                                                onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
+                                                className="cursor-pointer"
+                                            />
+                                            <div className="favorite-info">
+                                                <h4 onClick={() => navigate(`/recipes/${recipe.recipe_id}`)} className="cursor-pointer hover:text-orange-500">
+                                                    {recipe.title}
+                                                </h4>
+                                                <span className="favorite-date">
+                                                    Đã lưu: {recipe.created_at ? new Date(recipe.created_at).toLocaleDateString('vi-VN') : 'Gần đây'}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <button 
-                                        className="btn-remove-favorite" 
-                                        onClick={() => handleRemoveFavorite(recipe.recipe_id)}
-                                        title="Xóa khỏi bộ sưu tập"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
+                                        <button 
+                                            className="btn-remove-favorite text-red-500 hover:bg-red-50 p-2 rounded-full" 
+                                            onClick={() => handleRemoveFavorite(recipe.recipe_id)}
+                                            title="Bỏ yêu thích"
+                                        >
+                                            <Trash2 size={20} />
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-10 text-gray-400">
+                                    <Heart size={40} className="mx-auto mb-2" />
+                                    <p>Bộ sưu tập đang trống.</p>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
                 )}
@@ -262,8 +291,11 @@ const UserProfile = () => {
                 {activeTab === 'cart' && (
                     <div className="tab-content">
                         <h2>Giỏ đi chợ</h2>
-                        <p style={{color: '#718096'}}>Danh sách nguyên liệu bạn cần mua cho các món ăn đã chọn.</p>
-                        <div style={{textAlign: 'center', padding: '50px', color: '#cbd5e0'}}><ShoppingCart size={40} /><p>Giỏ hàng đang trống.</p></div>
+                        <p style={{color: '#718096'}}>Danh sách nguyên liệu bạn cần mua.</p>
+                        <div style={{textAlign: 'center', padding: '50px', color: '#cbd5e0'}}>
+                            <ShoppingCart size={40} className="mx-auto" />
+                            <p>Giỏ hàng đang trống.</p>
+                        </div>
                     </div>
                 )}
 
@@ -276,7 +308,9 @@ const UserProfile = () => {
                                 <label>Họ và tên</label>
                                 <input type="text" className="cr-input" defaultValue={userData?.user.full_name} style={{width: '100%', marginTop: '5px'}} />
                             </div>
-                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: '#white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>Cập nhật thông tin</button>
+                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>
+                                Cập nhật thông tin
+                            </button>
                         </div>
                     </div>
                 )}

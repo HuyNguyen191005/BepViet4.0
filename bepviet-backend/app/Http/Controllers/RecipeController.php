@@ -361,4 +361,5 @@ class RecipeController extends Controller
             return response()->json(['message' => 'Lỗi xóa: ' . $e->getMessage()], 500);
         }
     }
+    
 }

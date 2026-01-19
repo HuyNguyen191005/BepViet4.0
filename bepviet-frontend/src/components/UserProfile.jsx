@@ -4,7 +4,7 @@ import axiosClient from '../api/axiosClient';
 import './UserProfile.css';
 import { 
     User, BookOpen, Heart, ShoppingCart, Settings, 
-    LogOut, Clock, Trash2, CheckCircle, Eye, Calendar 
+    LogOut, Trash2, Eye, Calendar 
 } from 'lucide-react';
 
 const UserProfile = () => {
@@ -25,6 +25,30 @@ const UserProfile = () => {
             })
             .catch(() => setLoading(false));
     }, [navigate]);
+
+    // --- HÀM XỬ LÝ URL ẢNH (FIX LỖI) ---
+    const getImageUrl = (url) => {
+        if (!url) return ''; // Hoặc trả về ảnh mặc định
+        if (url.startsWith('http')) {
+            return url; // Nếu đã có http thì giữ nguyên
+        }
+        return `http://localhost:8000/storage/${url}`; // Nếu chưa có thì nối domain
+    };
+
+    // --- HÀM XỬ LÝ XÓA YÊU THÍCH (Bổ sung để tránh lỗi undefined) ---
+    const handleRemoveFavorite = (recipeId) => {
+        if(window.confirm('Bạn có chắc muốn xóa khỏi bộ sưu tập?')) {
+            // TODO: Gọi API xóa yêu thích ở đây
+            // axiosClient.post(`/favorite/remove/${recipeId}`)...
+            console.log("Xóa recipe id:", recipeId);
+            
+            // Tạm thời cập nhật UI giả lập
+            setUserData(prev => ({
+                ...prev,
+                favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId)
+            }));
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('ACCESS_TOKEN');
@@ -105,7 +129,9 @@ const UserProfile = () => {
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
-                                        <img src={`http://localhost:8000/storage/${recipe.image_url}`} alt={recipe.title} />
+                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
+                                        <img src={getImageUrl(recipe.image_url)} alt={recipe.title} />
+                                        
                                         <div className="recipe-info">
                                             <h4>{recipe.title}</h4>
                                             <span className={`badge ${recipe.status === 'Published' ? 'badge-published' : 'badge-draft'}`}>
@@ -135,8 +161,9 @@ const UserProfile = () => {
                                 <div key={recipe.recipe_id} className="favorite-horizontal-card">
                                     {/* Phần bên trái: Ảnh + Thông tin */}
                                     <div className="favorite-left-group">
+                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img 
-                                            src={`http://localhost:8000/storage/${recipe.image_url}`} 
+                                            src={getImageUrl(recipe.image_url)} 
                                             alt={recipe.title} 
                                             onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
                                         />
@@ -180,7 +207,7 @@ const UserProfile = () => {
                                 <label>Họ và tên</label>
                                 <input type="text" className="cr-input" defaultValue={userData?.user.full_name} style={{width: '100%', marginTop: '5px'}} />
                             </div>
-                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: '#white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>Cập nhật thông tin</button>
+                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>Cập nhật thông tin</button>
                         </div>
                     </div>
                 )}

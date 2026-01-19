@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
+use App\Models\Activity;
 use App\Models\Step; // Đảm bảo đã có Model Step
 use Illuminate\Support\Facades\DB; // <-- QUAN TRỌNG: Để dùng Transaction
 use Illuminate\Support\Facades\Validator;
@@ -197,9 +198,15 @@ public function getCategories() {
             ]);
         }
     }
-
+            Activity::create([
+                'user_id'  => auth()->id(),
+                'username' => auth()->user()->full_name,
+                'action'   => 'vừa đăng một công thức mới: ' . $recipe->title,
+                'type'     => 'recipe' // Loại là recipe để Admin dễ phân loại
+            ]);
             // Nếu mọi thứ ngon lành -> Lưu vào DB thật
             DB::commit();
+            
             return response()->json([
                 'message' => 'Tạo món ăn thành công!',
                 'recipe' => $recipe

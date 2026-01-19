@@ -268,4 +268,21 @@ public function getCategories() {
             'message' => 'Cập nhật bộ sưu tập thành công'
         ]);
     }
+    public function moveToTrash($id)
+{
+    // Tìm món ăn đúng của User đang đăng nhập để tránh xóa nhầm bài người khác
+    $recipe = Recipe::where('recipe_id', $id)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+    if (!$recipe) {
+        return response()->json(['message' => 'Bạn không có quyền xóa bài này hoặc bài viết không tồn tại'], 404);
+    }
+
+    // XÓA VĨNH VIỄN: Xóa bản ghi khỏi Database
+    $recipe->delete(); 
+
+    return response()->json(['message' => 'Đã xóa bài viết vĩnh viễn thành công']);
+}
+        
 }

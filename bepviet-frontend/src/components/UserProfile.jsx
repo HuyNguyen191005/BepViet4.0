@@ -32,7 +32,44 @@ const UserProfile = () => {
         navigate('/login');
         window.location.reload();
     };
-
+    // --- HÀM XỬ LÝ XÓA CÔNG THỨC (CHUYỂN VÀO THÙNG RÁC) ---
+    const handleMoveToTrash = async (recipeId) => {
+        if (window.confirm("CẢNH BÁO: Bài viết sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?")) {
+            try {
+                await axiosClient.patch(`/recipes/${recipeId}/trash`); 
+                
+                // XÓA KHỎI DANH SÁCH: Lọc bỏ bài viết vừa xóa ra khỏi mảng recipes
+                setUserData(prev => ({
+                    ...prev,
+                    recipes: prev.recipes.filter(r => r.recipe_id !== recipeId), // Xóa hẳn khỏi giao diện
+                    recipes_count: prev.recipes_count - 1 // Giảm con số tổng bài viết trên dashboard
+                }));
+    
+                alert("Đã xóa bài viết vĩnh viễn!");
+            } catch (err) {
+                alert("Không thể xóa bài viết.");
+            }
+        }
+    };
+    // --- HÀM XỬ LÝ BỎ YÊU THÍCH ---
+    const handleRemoveFavorite = async (recipeId) => {
+        if (window.confirm("Bạn có muốn bỏ món ăn này khỏi bộ sưu tập?")) {
+            try {
+                // SỬA TẠI ĐÂY: Gọi API favorite thay vì trash
+                await axiosClient.post(`/recipes/${recipeId}/favorite`); 
+                
+                // Cập nhật lại giao diện ngay lập tức
+                setUserData(prev => ({
+                    ...prev,
+                    favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId),
+                    favorites_count: (prev.favorites_count || 1) - 1
+                }));
+                alert("Đã bỏ khỏi bộ sưu tập!");
+            } catch (err) {
+                alert("Lỗi khi bỏ yêu thích.");
+            }
+        }
+    };
     if (loading) return <div className="loading">Đang tải dữ liệu...</div>;
 
     return (
@@ -105,7 +142,10 @@ const UserProfile = () => {
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
-                                        <img src={`http://localhost:8000/storage/${recipe.image_url}`} alt={recipe.title} />
+                                        <img 
+                                            src={recipe.image_url?.startsWith('http') ? recipe.image_url : `http://localhost:8000/storage/${recipe.image_url}`} 
+                                            alt={recipe.title} 
+                                        />
                                         <div className="recipe-info">
                                             <h4>{recipe.title}</h4>
                                             <span className={`badge ${recipe.status === 'Published' ? 'badge-published' : 'badge-draft'}`}>
@@ -114,7 +154,9 @@ const UserProfile = () => {
                                         </div>
                                         <div className="recipe-meta">
                                             <span><Eye size={14} /> {recipe.views}</span>
-                                            <button className="btn-icon-trash"><Trash2 size={16} /></button>
+                                            <button className="btn-icon-trash" onClick={() => handleMoveToTrash(recipe.recipe_id)}>
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))

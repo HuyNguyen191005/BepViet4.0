@@ -13,6 +13,10 @@ export default function Header() {
             setUser(JSON.parse(userStr));
         }
     }, []);
+    // --- HÀM CHUYỂN TRANG PROFILE (MỚI THÊM) ---
+    const goToProfile = () => {
+        navigate('/profile');
+    };
 
     const handleCreateClick = () => {
         // Chuyển hướng sang trang tạo công thức
@@ -24,7 +28,7 @@ export default function Header() {
         localStorage.removeItem('USER_INFO');
         setUser(null);
         navigate('/login');
-        window.location.reload();
+        window.location.reload();   
     };
 
     const handleSearch = (e) => {
@@ -93,18 +97,27 @@ export default function Header() {
 
                             {/* Avatar & Tên */}
                             <div className="user-profile">
-                                {/* --- SỬA THẺ IMG TẠI ĐÂY --- */}
+                                {/* 1. NHẤN VÀO ẢNH ĐỂ VÀO PROFILE */}
                                 <img 
                                     src={getAvatarUrl(user.avatar || user.image)} 
                                     alt="Avatar" 
                                     className="user-avatar" 
+                                    onClick={goToProfile}
+                                    style={{ cursor: 'pointer' }}
                                     onError={(e) => {
                                         e.target.onerror = null; 
-                                        e.target.src = '/default-avatar.png'; // Ảnh dự phòng khi lỗi
+                                        e.target.src = '/default-avatar.png';
                                     }}
                                 />
                                 <div className="user-dropdown">
-                                    <span className="user-name">Chào, {user.full_name}</span>
+                                    {/* 2. NHẤN VÀO LỜI CHÀO ĐỂ VÀO PROFILE */}
+                                    <span 
+                                        className="user-name" 
+                                        onClick={goToProfile}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        Chào, {user.full_name}
+                                    </span>
                                     <button onClick={handleLogout} className="logout-text">Đăng xuất</button>
                                 </div>
                             </div>

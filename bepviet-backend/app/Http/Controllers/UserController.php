@@ -47,5 +47,22 @@ class UserController extends Controller
         $user->delete();
         return response()->json(['message' => 'Xóa tài khoản thành công']);
     }
+    
+    public function getProfile() {
+        $user = auth()->user(); // Lấy user hiện tại thông qua Token
+    
+        // Lấy danh sách công thức của user này kèm đếm số lượng
+        $recipes = \App\Models\Recipe::where('user_id', $user->user_id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+    
+        return response()->json([
+            'user' => $user,
+            'recipes' => $recipes,
+            'recipes_count' => $recipes->count(),
+            'posts_count' => \App\Models\Post::where('user_id', $user->user_id)->count(),
+            'total_views' => $recipes->sum('views'), // Tính tổng lượt xem món ăn
+        ]);
+    }
 }
 

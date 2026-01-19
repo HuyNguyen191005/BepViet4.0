@@ -41,6 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'store']); 
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::post('/comments', [CommentController::class, 'store']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/user/profile', [UserController::class, 'getProfile']);
+        // ... các route khác ...
+    });
 });
 
 

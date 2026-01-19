@@ -26,6 +26,8 @@ import CreatePost from './pages/CreatePost';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRecipePanel from './pages/AdminRecipePanel';
 
+import UserProfile from './components/UserProfile';
+
 function App() {
   const getUserInfo = () => {
     try {
@@ -68,7 +70,10 @@ function App() {
             <Route path="/blog/:id" element={<PostDetail />} />
             <Route path="/create-post" element={<CreatePost />} />
 
-
+            {/* Thêm vào trong nhóm Route của DefaultLayout để có Header/Footer */}
+            <Route index element={<Home />} />
+            <Route path="/profile" element={<UserProfile />} /> {/* DÒNG CẦN THÊM */}
+                {/* ... các route khác ... */}
         </Route>
           {/* Nhóm trang Admin */}
           <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>

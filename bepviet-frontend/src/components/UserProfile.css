@@ -1,0 +1,241 @@
+/* UserProfile.css */
+.profile-container {
+    display: flex;
+    max-width: 1250px;
+    margin: 40px auto;
+    gap: 30px;
+    padding: 0 20px;
+    background-color: #f8fafc;
+    min-height: 80vh;
+}
+
+/* Sidebar bên trái */
+.profile-sidebar {
+    width: 320px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+.user-info-box {
+    text-align: center;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+}
+
+.user-avatar-large {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f91a1, #7eb6c4);
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 145, 161, 0.3);
+}
+
+.user-display-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 5px;
+}
+
+.user-member-status {
+    font-size: 12px;
+    color: #4f91a1;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: #eef7f9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.user-display-email {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 12px;
+}
+
+.user-join-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #a0aec0;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #4a5568;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.menu-item:hover {
+    background: #f7fafc;
+    color: #4f91a1;
+}
+
+.menu-item.active {
+    background: #4f91a1;
+    color: white;
+}
+
+.menu-item.logout {
+    margin-top: 30px;
+    color: #e53e3e;
+    border-top: 1px solid #edf2f7;
+    padding-top: 20px;
+    border-radius: 0;
+}
+
+/* Nội dung chính bên phải */
+.profile-main-content {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Stats Bar */
+.stats-bar {
+    display: flex;
+    gap: 50px;
+    background: #f8fafc;
+    padding: 20px 30px;
+    border-radius: 12px;
+    margin-bottom: 35px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #718096;
+}
+
+/* Tab điều hướng lọc bài viết */
+.filter-tabs {
+    display: flex;
+    gap: 30px;
+    border-bottom: 2px solid #edf2f7;
+    margin-bottom: 25px;
+}
+
+.filter-tabs button {
+    background: none;
+    border: none;
+    padding: 12px 5px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #a0aec0;
+    cursor: pointer;
+    position: relative;
+    transition: 0.3s;
+}
+
+.filter-tabs button.active {
+    color: #4f91a1;
+}
+
+.filter-tabs button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #4f91a1;
+}
+
+/* Danh sách bài đăng nằm ngang */
+.recipe-horizontal-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: 0.2s;
+}
+
+.recipe-horizontal-card:hover {
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+.recipe-horizontal-card img {
+    width: 100px;
+    height: 75px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.recipe-info {
+    flex: 1;
+}
+
+.recipe-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #2d3748;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-published { background: #c6f6d5; color: #22543d; }
+.badge-draft { background: #feebc8; color: #744210; }
+.badge-trash { background: #fed7d7; color: #822727; }
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: #cbd5e0;
+}
+
+.empty-state p {
+    margin-top: 15px;
+    font-size: 16px;
+}

@@ -1,98 +1,80 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Trash2, Upload, Plus, Camera } from "lucide-react";
 
 const CreateRecipe = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  // --- STATE DỮ LIỆU ---
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     cooking_time: "",
     difficulty: "Trung bình",
     servings: "",
-    status: "Published",
   });
 
-  // --- 1. THÊM STATE CHO DANH MỤC ---
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-
   const [mainImage, setMainImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-
-  const [ingredients, setIngredients] = useState([
-    { ingredient_id: "", quantity: "", unit: "Gram" }
-  ]);
-  
   const [availableIngredients, setAvailableIngredients] = useState([]);
+  const [ingredients, setIngredients] = useState([{ ingredient_id: "", quantity: "", unit: "Gram" }]);
+  const [steps, setSteps] = useState([{ content: "", image_file: null, image_preview: null }]);
 
-  const [steps, setSteps] = useState([
-    { content: "", image_file: null, image_preview: null }
-  ]);
-
+  // --- 1. KIỂM TRA ĐĂNG NHẬP ---
   useEffect(() => {
-    // --- 2. THÊM DỮ LIỆU GIẢ LẬP CHO DANH MỤC ---
+    const token = localStorage.getItem('ACCESS_TOKEN');
+    if (!token) {
+        alert("Vui lòng đăng nhập để đăng công thức!");
+        navigate('/login');
+        return;
+    }
+
+    // Dữ liệu mẫu cho danh mục và nguyên liệu
     setCategories([
-      { id: 1, name: "Món sáng" },
-      { id: 2, name: "Món chính" },
-      { id: 3, name: "Ăn vặt" },
-      { id: 4, name: "Đồ uống" },
-      { id: 5, name: "Bánh ngọt" },
-      { id: 6, name: "Healthy/Diet" },
+      { id: 1, name: "Món sáng" }, { id: 2, name: "Món chính" },
+      { id: 3, name: "Ăn vặt" }, { id: 4, name: "Đồ uống" },
+      { id: 5, name: "Bánh ngọt" }, { id: 6, name: "Healthy/Diet" },
     ]);
 
-    // Giả lập nguyên liệu
     setAvailableIngredients([
-      { id: 1, name: "Thịt bò" },
-      { id: 2, name: "Thịt gà" },
-      { id: 3, name: "Trứng gà" },
-      { id: 4, name: "Cà chua" },
-      { id: 5, name: "Hành tây" },
-      { id: 6, name: "Bánh phở" },
+      { id: 1, name: "Thịt bò" }, { id: 2, name: "Thịt gà" },
+      { id: 3, name: "Trứng gà" }, { id: 4, name: "Cà chua" },
+      { id: 5, name: "Hành tây" }, { id: 6, name: "Bánh phở" },
     ]);
-  }, []);
+  }, [navigate]);
 
+  // --- 2. CÁC HÀM XỬ LÝ (MỚI BỔ SUNG ĐỂ HẾT TRẮNG TRANG) ---
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // --- 3. HÀM XỬ LÝ CHỌN DANH MỤC (CHECKBOX) ---
   const handleCategoryChange = (catId) => {
-    setSelectedCategories(prev => {
-      if (prev.includes(catId)) {
-        return prev.filter(id => id !== catId); // Bỏ chọn
-      } else {
-        return [...prev, catId]; // Chọn thêm
-      }
-    });
+    setSelectedCategories(prev => prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]);
   };
 
   const handleMainImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setMainImage(file);
-      setPreviewImage(URL.createObjectURL(file));
-    }
+    if (file) { setMainImage(file); setPreviewImage(URL.createObjectURL(file)); }
   };
 
+  // Hàm thêm/xóa nguyên liệu
+  const addIngredientRow = () => setIngredients([...ingredients, { ingredient_id: "", quantity: "", unit: "Gram" }]);
+  const removeIngredientRow = (index) => setIngredients(ingredients.filter((_, i) => i !== index));
   const handleIngredientChange = (index, field, value) => {
     const newIngredients = [...ingredients];
     newIngredients[index][field] = value;
     setIngredients(newIngredients);
   };
 
-  const addIngredientRow = () => {
-    setIngredients([...ingredients, { ingredient_id: "", quantity: "", unit: "Gram" }]);
-  };
-
-  const removeIngredientRow = (index) => {
-    const newIngredients = ingredients.filter((_, i) => i !== index);
-    setIngredients(newIngredients);
-  };
-
+  // Hàm thêm/xóa/sửa các bước làm
+  const addStepRow = () => setSteps([...steps, { content: "", image_file: null, image_preview: null }]);
   const handleStepChange = (index, value) => {
     const newSteps = [...steps];
     newSteps[index].content = value;
     setSteps(newSteps);
   };
-
   const handleStepImageChange = (index, e) => {
     const file = e.target.files[0];
     if (file) {
@@ -103,77 +85,54 @@ const CreateRecipe = () => {
     }
   };
 
-  const addStepRow = () => {
-    setSteps([...steps, { content: "", image_file: null, image_preview: null }]);
-  };
-
+  // --- 3. HÀM GỬI DỮ LIỆU ---
   const handleSubmit = async (statusType) => {
-    // --- 4. KIỂM TRA ĐÃ CHỌN DANH MỤC CHƯA ---
-    if (selectedCategories.length === 0) {
-        alert("Vui lòng chọn ít nhất 1 danh mục cho món ăn!");
+    if (!formData.title || !mainImage || selectedCategories.length === 0) {
+        alert("Vui lòng điền đủ Tiêu đề, Ảnh và 1 Danh mục!");
+        const data = new FormData();
         return;
     }
-// Kiểm tra thời gian nấu
-    if (!formData.cooking_time) {
-        alert("Bạn quên nhập Thời gian nấu rồi!");
-        return;
-    }
-    // ---Kiểm tra ảnh đại diện ---
-    if (!mainImage) {
-        alert("Vui lòng chọn Ảnh đại diện cho món ăn!");
-        return;
-    }
+
+    const token = localStorage.getItem('ACCESS_TOKEN'); //
     const data = new FormData();
+    
     data.append("title", formData.title);
-    data.append("description", formData.description);
+    data.append("description", formData.description || "");
     data.append("cooking_time", formData.cooking_time);
     data.append("difficulty", formData.difficulty);
     data.append("servings", formData.servings);
     data.append("status", statusType);
-    
-    // Hardcode user_id để test:
-    data.append("user_id", 1); 
+    data.append("image", mainImage); 
 
-    // --- 5. GỬI DANH SÁCH DANH MỤC LÊN SERVER ---
-    // Laravel yêu cầu dạng category_ids[] để nhận diện là mảng
-    selectedCategories.forEach(catId => {
-        data.append("category_ids[]", catId);
-    });
-
-    if (mainImage) {
-      data.append("image", mainImage); 
-    }
-
-    ingredients.forEach((ing, index) => {
-      // Chỉ gửi nguyên liệu nếu đã chọn tên
+    selectedCategories.forEach(id => data.append("category_ids[]", id));
+    ingredients.forEach((ing, i) => {
       if (ing.ingredient_id) {
-          data.append(`ingredients[${index}][ingredient_id]`, ing.ingredient_id);
-          data.append(`ingredients[${index}][quantity]`, ing.quantity);
-          data.append(`ingredients[${index}][unit]`, ing.unit);
+        data.append(`ingredients[${i}][ingredient_id]`, ing.ingredient_id);
+        data.append(`ingredients[${i}][quantity]`, ing.quantity);
+        data.append(`ingredients[${i}][unit]`, ing.unit);
       }
     });
-
-    steps.forEach((step, index) => {
-      data.append(`steps[${index}][content]`, step.content);
-      if (step.image_file) {
-        data.append(`steps[${index}][image]`, step.image_file);
-      }
+    steps.forEach((step, i) => {
+      data.append(`steps[${i}][content]`, step.content);
+      if (step.image_file) data.append(`steps[${i}][image]`, step.image_file);
     });
 
+    setLoading(true);
     try {
       await axios.post("http://localhost:8000/api/recipes", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}` // QUAN TRỌNG ĐỂ LARAVEL NHẬN DIỆN
+        },
       });
-      alert("Thành công! Món ăn đã được tạo.");
-      // Có thể thêm navigate('/') để về trang chủ
+      alert("Đăng công thức thành công!");
+      navigate('/'); 
     } catch (error) {
-      console.error(error);
-      // Hiển thị lỗi chi tiết từ Laravel nếu có
-      const serverError = error.response?.data?.message || error.message;
-      alert("Lỗi: " + serverError);
-    }
+      alert("Lỗi: " + (error.response?.data?.message || "Lỗi server"));
+    } finally { setLoading(false); }
   };
 
+  // --- 4. GIAO DIỆN (JSX) ---
   return (
     <div className="cr-container">
       <h1 className="cr-page-title">Đăng Công Thức Mới</h1>

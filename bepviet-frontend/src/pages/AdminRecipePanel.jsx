@@ -1,25 +1,72 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import '../Admin.css';
 
 const AdminRecipePanel = () => {
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();// thêm 
 
     useEffect(() => {
-        axiosClient.get('/admin/recipes')
-            .then(res => {
-            // SỬA TẠI ĐÂY: Phải dùng setRecipes mới đúng với biến đã khai báo bên trên
-            setRecipes(res.data); 
-            setLoading(false);
-            })
-            .catch(err => {
-                console.error("Lỗi lấy danh sách công thức:", err);
-                setLoading(false);
-            });
-    }, []);
-
+            fetchRecipes();
+        }, []);
+    
+        const fetchRecipes = () => {
+            setLoading(true);
+            axiosClient.get('/admin/recipes')
+                .then(res => {
+                    // Sửa lỗi: dùng setRecipes thay vì setUsers
+                    setRecipes(Array.isArray(res.data) ? res.data : []); 
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error("Lỗi:", err);
+                    setLoading(false);
+                });
+        };
+    
+        // --- CHỨC NĂNG XEM BÀI ---
+        const handleView = (id) => {
+            navigate(`/recipes/${id}`); // Chuyển đến trang chi tiết đã có
+        };
+    
+        // --- CHỨC NĂNG DUYỆT BÀI ---
+        // 1. Thêm hàm xử lý Duyệt bài
+        const handleApprove = (id) => {
+            if (window.confirm("Bạn có chắc chắn muốn duyệt bài viết này không?")) {
+                axiosClient.patch(`/admin/recipes/${id}/approve`)
+                    .then(res => {
+                        alert("Duyệt bài thành công!");
+                        // Cập nhật lại state local: Tìm bài viết vừa duyệt và thay thế bằng dữ liệu mới từ Server
+                        setRecipes(recipes.map(r => r.recipe_id === id ? res.data : r));
+                    })
+                    .catch(err => {
+                        alert("Lỗi khi duyệt bài: " + (err.response?.data?.message || err.message));
+                    });
+            }
+        };
+    
+        // --- CHỨC NĂNG XÓA BÀI ---
+        const handleDelete = (id) => {
+            if (window.confirm("Bạn có chắc chắn muốn xóa vĩnh viễn bài viết này?")) {
+                axiosClient.delete(`/admin/recipes/${id}`)
+                    .then(() => {
+                        alert("Đã xóa bài viết");
+                        setRecipes(recipes.filter(r => r.recipe_id !== id));
+                    })
+                    .catch(err => alert("Lỗi khi xóa: " + err.message));
+            }
+        };
     // Hàm chuyển đổi trạng thái DB sang tiếng Việt theo thiết kế
+    const handleToggleStatus = (id) => {
+        axiosClient.patch(`/admin/recipes/${id}/status`)
+            .then(res => {
+                // Cập nhật lại danh sách ngay lập tức trên màn hình
+                setRecipes(recipes.map(r => r.recipe_id === id ? res.data : r));
+            })
+            .catch(err => alert("Lỗi hệ thống: " + err.message));
+    };
     const renderStatus = (status) => {
         switch(status) {
             case 'Published': 
@@ -73,33 +120,38 @@ const AdminRecipePanel = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* THÊM 'index' vào hàm map để lấy số thứ tự */}
                         {recipes.map((recipe, index) => (
                             <tr key={recipe.recipe_id}>
-                                {/* HIỂN THỊ THEO THỨ TỰ 01, 02, 03... */}
-                                <td>
-                                    {(index + 1) < 10 ? `0${index + 1}` : index + 1}
-                                </td>
+                                {/* CHỈNH ID ĐÚNG THỨ TỰ */}
+                                <td>{(index + 1) < 10 ? `0${index + 1}` : index + 1}</td>
                                 
                                 <td>
-                                    <img 
-                                        src={recipe.image_url || '/logo.png'} 
-                                        alt={recipe.title} 
-                                        className="recipe-thumb" 
-                                    />
+                                    <img src={recipe.image_url || '/logo.png'} className="recipe-thumb" alt="thumb" />
                                 </td>
                                 <td>
                                     <b>{recipe.title}</b><br/>
-                                    <small style={{color: '#999'}}>
-                                        {recipe.categories?.[0]?.name || 'Chưa phân loại'}
-                                    </small>
+                                    <small>{recipe.categories?.[0]?.name || 'N/A'}</small>
                                 </td>
-                                <td>{recipe.author?.full_name}</td>
+                                <td>{recipe.author?.full_name || recipe.user?.full_name}</td>
                                 <td>{renderStatus(recipe.status)}</td>
                                 <td className="action-buttons">
-                                    <button className="edit-btn" title="Xem">👁️</button>
-                                    <button className="lock-btn" title="Duyệt">✔️</button>
-                                    <button className="delete-btn" title="Xóa">❌</button>
+                                    {/* Nút Xem: icon con mắt */}
+                                    <button className="edit-btn" onClick={() => handleView(recipe.recipe_id)}>👁️</button>
+                                    
+                                    {/* NÚT TÙY CHỈNH DUYỆT (Luôn hiện lên) */}
+                                    <button 
+                                        className={`lock-btn ${recipe.status === 'Published' ? 'active-green' : ''}`} 
+                                        title={recipe.status === 'Published' ? "Hủy duyệt" : "Duyệt bài"}
+                                        onClick={() => handleToggleStatus(recipe.recipe_id)}
+                                        style={{ 
+                                            backgroundColor: recipe.status === 'Published' ? '#dcfce7' : '#fefce8',
+                                            color: recipe.status === 'Published' ? '#15803d' : '#ca8a04'
+                                        }}
+                                    >
+                                        {recipe.status === 'Published' ? '✔️' : '⏳'}
+                                    </button>
+                                    {/* Nút Xóa: icon X đỏ */}
+                                    <button className="delete-btn" onClick={() => handleDelete(recipe.recipe_id)}>❌</button>
                                 </td>
                             </tr>
                         ))}

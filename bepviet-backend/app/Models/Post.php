@@ -12,6 +12,8 @@ class Post extends Model
     // 1. Khai báo tên bảng trong Database
     protected $table = 'posts';
 
+    public $timestamps = false;
+
     // 2. QUAN TRỌNG: Khai báo khóa chính (Vì bạn dùng post_id chứ không phải id)
     protected $primaryKey = 'post_id';
 

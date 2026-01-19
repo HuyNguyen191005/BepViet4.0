@@ -211,6 +211,7 @@ public function getCategories() {
             return response()->json(['message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
         }
     }
+
         public function getAdminRecipes()
     {
         // Đổi 'author' thành 'user' nếu bạn chưa định nghĩa hàm author() trong Model Recipe
@@ -219,5 +220,34 @@ public function getCategories() {
         ->get();
 
         return response()->json($recipes);
+    }
+
+    public function approve($id)
+    {
+        $recipe = Recipe::findOrFail($id);
+        
+        // Cập nhật trạng thái thành Published (Đã duyệt)
+        $recipe->status = 'Published';
+        $recipe->save();
+
+        // Trả về dữ liệu đã cập nhật kèm thông tin liên quan để Frontend hiển thị lại
+        return response()->json($recipe->load(['author', 'categories']));
+    }
+    public function destroy($id) {
+        $recipe = Recipe::findOrFail($id);
+        $recipe->delete();
+        return response()->json(['message' => 'Đã xóa công thức thành công']);
+    }
+    
+    public function toggleStatus($id)
+    {
+        $recipe = Recipe::findOrFail($id);
+        
+        // Đảo ngược trạng thái: Nếu đang 'Published' thì về 'Draft' và ngược lại
+        $recipe->status = ($recipe->status === 'Published') ? 'Draft' : 'Published';
+        $recipe->save();
+    
+        // Trả về dữ liệu đã cập nhật kèm thông tin author và categories
+        return response()->json($recipe->load(['author', 'categories']));
     }
 }

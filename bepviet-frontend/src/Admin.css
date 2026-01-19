@@ -647,3 +647,24 @@
 .orange-bg { background: #ffedd5; color: #ea580c; }
 .act-info p { margin: 0; font-size: 0.95rem; color: #334155; }
 .act-info span { font-size: 0.8rem; color: #94a3b8; }
+
+
+/* --- TRANG QUẢN LÝ CÔNG THỨC --- */
+.recipe-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-badge.yellow {
+    background-color: #fefce8;
+    color: #ca8a04;
+}
+
+/* Tùy chỉnh thêm icon tác vụ giống hình */
+.action-buttons .lock-btn {
+    background-color: #dcfce7;
+    color: #16a34a;
+}

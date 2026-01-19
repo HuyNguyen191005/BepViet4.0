@@ -211,4 +211,13 @@ public function getCategories() {
             return response()->json(['message' => 'Lỗi hệ thống: ' . $e->getMessage()], 500);
         }
     }
+        public function getAdminRecipes()
+    {
+        // Đổi 'author' thành 'user' nếu bạn chưa định nghĩa hàm author() trong Model Recipe
+        $recipes = Recipe::with(['author', 'categories']) 
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+        return response()->json($recipes);
+    }
 }

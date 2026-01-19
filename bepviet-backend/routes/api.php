@@ -51,3 +51,4 @@ Route::patch('/admin/users/{id}/status', [UserController::class, 'toggleStatus']
 Route::delete('/admin/users/{id}', [UserController::class, 'destroy']); // Xóa tài khoản
 
 Route::get('/admin/dashboard', [DashboardController::class, 'index']);
+Route::get('/admin/recipes', [RecipeController::class, 'getAdminRecipes']);

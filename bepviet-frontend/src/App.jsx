@@ -24,7 +24,7 @@ import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
 
 import AdminDashboard from './pages/AdminDashboard';
-
+import AdminRecipePanel from './pages/AdminRecipePanel';
 
 function App() {
   const getUserInfo = () => {
@@ -70,14 +70,18 @@ function App() {
 
 
         </Route>
-         {/* Nhóm trang Admin */}
+          {/* Nhóm trang Admin */}
+          <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
+          {/* Trang mặc định khi vào /admin là Tổng quan */}
+          <Route index element={<AdminDashboard />} />  
+          {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
+          <Route path="users" element={<AdminPanel />} /> 
+          // Trong nhóm Route Admin
+        </Route>
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
-        {/* Trang mặc định khi vào /admin là Tổng quan */}
-        <Route index element={<AdminDashboard />} />  
-        {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
-        <Route path="users" element={<AdminPanel />} /> 
-        
-        
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminPanel />} />
+              <Route path="recipes" element={<AdminRecipePanel />} /> {/* THÊM DÒNG NÀY */}
         </Route>
       </Routes>
     </BrowserRouter>

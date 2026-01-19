@@ -252,9 +252,20 @@ public function getCategories() {
         
         // Đảo ngược trạng thái: Nếu đang 'Published' thì về 'Draft' và ngược lại
         $recipe->status = ($recipe->status === 'Published') ? 'Draft' : 'Published';
-        $recipe->seve();
+        $recipe->save();
     
         // Trả về dữ liệu đã cập nhật kèm thông tin author và categories
         return response()->json($recipe->load(['author','categorise']));
+    }
+
+    public function toggleFavorite($id) {
+        $user = auth()->user();
+        // toggle() sẽ tự động thêm nếu chưa có, xóa nếu đã có trong bảng favorites
+        $status = $user->favorites()->toggle($id);
+        
+        return response()->json([
+            'is_favorited' => count($status['attached']) > 0,
+            'message' => 'Cập nhật bộ sưu tập thành công'
+        ]);
     }
 }

@@ -49,20 +49,37 @@ class UserController extends Controller
     }
     
     public function getProfile() {
-        $user = auth()->user(); // Lấy user hiện tại thông qua Token
+        // $user = auth()->user(); // Lấy user hiện tại thông qua Token
     
-        // Lấy danh sách công thức của user này kèm đếm số lượng
-        $recipes = \App\Models\Recipe::where('user_id', $user->user_id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+        // // Lấy danh sách công thức của user này kèm đếm số lượng
+        // $recipes = \App\Models\Recipe::where('user_id', $user->user_id)
+        //             ->orderBy('created_at', 'desc')
+        //             ->get();
     
-        return response()->json([
-            'user' => $user,
-            'recipes' => $recipes,
-            'recipes_count' => $recipes->count(),
-            'posts_count' => \App\Models\Post::where('user_id', $user->user_id)->count(),
-            'total_views' => $recipes->sum('views'), // Tính tổng lượt xem món ăn
-        ]);
+        // return response()->json([
+        //     'user' => $user,
+        //     'recipes' => $recipes,
+        //     'recipes_count' => $recipes->count(),
+        //     'posts_count' => \App\Models\Post::where('user_id', $user->user_id)->count(),
+        //     'total_views' => $recipes->sum('views'), // Tính tổng lượt xem món ăn
+        // ]);
+    $user = auth()->user();
+    $recipes = \App\Models\Recipe::where('user_id', $user->user_id)
+    ->orderBy('created_at', 'desc')
+    ->get();
+    
+    // Lấy danh sách món ăn mà user đã nhấn LIKE
+    $favoriteRecipes = $user->favorites()->orderBy('favorites.created_at', 'desc')->get();
+
+    return response()->json([
+        'user' => $user,
+        'recipes' => $recipes,
+        'favorite_recipes' => $favoriteRecipes, // Gửi dữ liệu này về
+        'recipes_count' => $recipes->count(),
+        'favorites_count' => $favoriteRecipes->count(),
+        'posts_count' => \App\Models\Post::where('user_id', $user->user_id)->count(),
+        'total_views' => $recipes->sum('views')
+    ]);
     }
 }
 

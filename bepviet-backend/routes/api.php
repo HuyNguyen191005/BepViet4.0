@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments', [CommentController::class, 'store']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user/profile', [UserController::class, 'getProfile']);
+        Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
         // ... các route khác ...
     });
 });

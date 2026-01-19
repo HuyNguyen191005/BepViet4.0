@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
 import Comments from '../components/Comments'; // <-- 1. Import Component Bình luận
+import { Heart } from 'lucide-react'; // Đảm bảo đã import
 
 const RecipeDetail = () => {
     const { id } = useParams();
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isFavorited, setIsFavorited] = useState(false);
 
     useEffect(() => {
         axiosClient.get(`/recipes/${id}`)
@@ -30,7 +32,16 @@ const RecipeDetail = () => {
     const totalRating = recipe.reviews ? recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0) : 0;
     const avgRating = recipe.reviews && recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
     const reviewCount = recipe.reviews ? recipe.reviews.length : 0;
-
+    const handleToggleFavorite = async () => {
+        try {
+            const res = await axiosClient.post(`/recipes/${id}/favorite`);
+            setIsFavorited(res.data.is_favorited);
+            alert(res.data.is_favorited ? "Đã thêm vào bộ sưu tập!" : "Đã xóa khỏi bộ sưu tập!");
+        } catch (err) {
+            alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+        }
+    };
+    
     return (
         <div style={{background: '#f8f9fa', minHeight: '100vh', paddingBottom: '50px'}}>
             <div style={{background:'white', padding:'15px 50px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)', marginBottom:'20px'}}>
@@ -59,10 +70,22 @@ const RecipeDetail = () => {
                             <div style={{fontSize:'12px', color:'#999'}}>Ngày: {new Date(recipe.created_at).toLocaleDateString()}</div>
                         </div>
                     </div>
+                    <div className="recipe-header">
+               
+                {/* NÚT LIKE HÌNH TRÁI TIM */}
+                <button 
+                onClick={handleToggleFavorite}
+                className={`btn-heart-like ${isFavorited ? 'active' : ''}`}
+            >
+                <Heart size={25} fill={isFavorited ? "#e53e3e" : "none"} strokeWidth={2.5} />
+                <span>{isFavorited ? 'Đã lưu' : 'Yêu thích'}</span>
+                </button>
+                </div>  
                     <div>
                         <span style={{color:'#f59e0b', fontSize:'18px'}}>★ {avgRating} ({reviewCount} đánh giá)</span>
                     </div>
                 </div>
+                
 
                 {/* META BAR */}
                 <div className="meta-bar">

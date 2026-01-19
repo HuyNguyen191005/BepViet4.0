@@ -85,7 +85,7 @@ const UserProfile = () => {
                                 <div className="stat-label">Lượt xem</div>
                             </div>
                             <div className="stat-item">
-                                <div className="stat-value">0</div>
+                                <div className="stat-value">{userData?.favorites_count || 0}</div>
                                 <div className="stat-label">Đã lưu</div>
                             </div>
                         </div>
@@ -123,12 +123,42 @@ const UserProfile = () => {
                     </div>
                 )}
 
-                {/* 2. TAB BỘ SƯU TẬP (USER LIKED/SAVED) */}
+                {/* Trong phần nội dung chính, tìm đến Tab bộ sưu tập */}
                 {activeTab === 'collection' && (
                     <div className="tab-content">
-                        <h2>Bộ sưu tập yêu thích</h2>
-                        <p style={{color: '#718096'}}>Những công thức và bài viết bạn đã lưu hoặc yêu thích sẽ xuất hiện ở đây.</p>
-                        <div style={{textAlign: 'center', padding: '50px', color: '#cbd5e0'}}><Heart size={40} /><p>Chưa có mục nào trong bộ sưu tập.</p></div>
+                        <h2 className="content-title">
+                            <Heart size={20} className="title-icon" /> BỘ SƯU TẬP YÊU THÍCH
+                        </h2>
+                        
+                        <div className="favorite-list">
+                            {userData?.favorite_recipes?.map(recipe => (
+                                <div key={recipe.recipe_id} className="favorite-horizontal-card">
+                                    {/* Phần bên trái: Ảnh + Thông tin */}
+                                    <div className="favorite-left-group">
+                                        <img 
+                                            src={`http://localhost:8000/storage/${recipe.image_url}`} 
+                                            alt={recipe.title} 
+                                            onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
+                                        />
+                                        <div className="favorite-info">
+                                            <h4 onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}>
+                                                {recipe.title}
+                                            </h4>
+                                            <span className="favorite-date">Đã lưu: {new Date(recipe.created_at).toLocaleDateString('vi-VN')}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* NÚT XÓA: Luôn nằm ngang bên tay phải nhờ Flexbox */}
+                                    <button 
+                                        className="btn-remove-favorite" 
+                                        onClick={() => handleRemoveFavorite(recipe.recipe_id)}
+                                        title="Xóa khỏi bộ sưu tập"
+                                    >
+                                        <Trash2 size={20} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 

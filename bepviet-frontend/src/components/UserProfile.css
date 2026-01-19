@@ -239,3 +239,86 @@
     margin-top: 15px;
     font-size: 16px;
 }
+/* Nút Like ở trang chi tiết */
+.btn-heart-like {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #718096;
+}
+
+.btn-heart-like:hover { transform: scale(1.1); }
+.btn-heart-like.active { color: #e53e3e; }
+.btn-heart-like span { font-size: 12px; font-weight: bold; margin-top: 4px; }
+
+/* Giao diện danh sách yêu thích trong Profile */
+.favorite-horizontal-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* QUAN TRỌNG: Đẩy nút xóa về bên phải */
+    padding: 15px 20px;
+    background: #fff;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.favorite-horizontal-card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+    border-color: #4f91a1;
+}
+
+.favorite-left-group {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.favorite-left-group img {
+    width: 90px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.favorite-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 17px;
+    color: #2d3748;
+    cursor: pointer;
+}
+
+.favorite-info h4:hover { color: #4f91a1; }
+
+.favorite-date {
+    font-size: 12px;
+    color: #a0aec0;
+}
+
+/* Nút xóa màu đỏ bên tay phải */
+.btn-remove-favorite {
+    background: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-favorite:hover {
+    background: #e53e3e;
+    color: white;
+    transform: rotate(10deg);
+}

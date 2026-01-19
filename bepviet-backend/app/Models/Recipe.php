@@ -25,11 +25,15 @@ class Recipe extends Model
     ];
 
     // 1. Quan hệ với người đăng (User)
-    public function author()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
+    public function author()
+    {
+        // Liên kết đến bảng users qua khóa ngoại user_id
+        return $this->belongsTo(User::class, 'user_id');
+    }
     // 2. Quan hệ với Các bước làm (Steps) - 1 món có nhiều bước
     public function steps()
     {

@@ -22,6 +22,7 @@ Route::get('/recipes/{id}', [RecipeController::class, 'show']); // Lấy chi ti�
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']); // Lấy món theo danh mục
 Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
 
+
 // Route cần đăng nhập mới vào được (Test token)
 Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
 
@@ -31,7 +32,6 @@ Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
 // Route::post('/posts', [PostController::class, 'store']);
 Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'show']);
 
-
 // Các API cần đăng nhập (Phải có Token mới vào được)
 Route::middleware('auth:sanctum')->group(function () { 
     
@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/posts', [PostController::class, 'store']); 
+    Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::post('/comments', [CommentController::class, 'store']);
     Route::get('/user/profile', [UserController::class, 'getProfile']);

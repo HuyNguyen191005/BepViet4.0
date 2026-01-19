@@ -142,10 +142,12 @@ const UserProfile = () => {
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
+                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img 
-                                            src={recipe.image_url?.startsWith('http') ? recipe.image_url : `http://localhost:8000/storage/${recipe.image_url}`} 
+                                            src={recipe.image_url?.startsWith('http') ? recipe.image_url : getImageUrl(recipe.image_url)} 
                                             alt={recipe.title} 
                                         />
+                                        
                                         <div className="recipe-info">
                                             <h4>{recipe.title}</h4>
                                             <span className={`badge ${recipe.status === 'Published' ? 'badge-published' : 'badge-draft'}`}>

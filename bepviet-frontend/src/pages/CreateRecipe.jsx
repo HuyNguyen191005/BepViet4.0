@@ -90,6 +90,17 @@ const CreateRecipe = () => {
     if (!formData.title || !mainImage || selectedCategories.length === 0) {
         alert("Vui lòng điền đủ Tiêu đề, Ảnh và 1 Danh mục!");
         const data = new FormData();
+        data.append("status", "Draft");
+        try {
+          await axios.post("http://localhost:8000/api/recipes", data, {
+            headers: { 
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}` 
+            },
+          });
+          alert("Bài viết đã được gửi! Vui lòng chờ Admin duyệt.");
+          navigate('/'); 
+        } catch (error) { /* ... */ }
         return;
     }
 

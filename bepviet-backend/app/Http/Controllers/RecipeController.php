@@ -156,7 +156,8 @@ public function getCategories() {
                 'cooking_time' => $request->cooking_time,
                 'difficulty' => $request->difficulty,
                 'image_url' => $imagePath,
-                'status' => 'Published', // Mặc định chờ duyệt
+                'status'       => 'Draft',             
+                'views'        => 0,
             ]);
 
             // C. Lưu danh mục (Bảng trung gian recipe_categories)
@@ -198,8 +199,7 @@ public function getCategories() {
     }
 
             // Nếu mọi thứ ngon lành -> Lưu vào DB thật
-            DB::commit(); 
-
+            DB::commit();
             return response()->json([
                 'message' => 'Tạo món ăn thành công!',
                 'recipe' => $recipe

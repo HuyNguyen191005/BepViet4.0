@@ -125,31 +125,31 @@ const AdminRecipePanel = () => {
                                 {/* CHỈNH ID ĐÚNG THỨ TỰ */}
                                 <td>{(index + 1) < 10 ? `0${index + 1}` : index + 1}</td>
                                 
+                               {/* Hiển thị Badge trạng thái trực quan */}
                                 <td>
-                                    <img src={recipe.image_url || '/logo.png'} className="recipe-thumb" alt="thumb" />
+                                    <span className={`status-badge ${recipe.status === 'Draft' ? 'status-pending' : 'status-active'}`}>
+                                        {recipe.status === 'Draft' ? '⏳ Chờ duyệt' : '✅ Đã duyệt'}
+                                    </span>
                                 </td>
-                                <td>
+                                    <td>
                                     <b>{recipe.title}</b><br/>
                                     <small>{recipe.categories?.[0]?.name || 'N/A'}</small>
                                 </td>
                                 <td>{recipe.author?.full_name || recipe.user?.full_name}</td>
                                 <td>{renderStatus(recipe.status)}</td>
                                 <td className="action-buttons">
-                                    {/* Nút Xem: icon con mắt */}
                                     <button className="edit-btn" onClick={() => handleView(recipe.recipe_id)}>👁️</button>
                                     
-                                    {/* NÚT TÙY CHỈNH DUYỆT (Luôn hiện lên) */}
-                                    <button 
-                                        className={`lock-btn ${recipe.status === 'Published' ? 'active-green' : ''}`} 
-                                        title={recipe.status === 'Published' ? "Hủy duyệt" : "Duyệt bài"}
-                                        onClick={() => handleToggleStatus(recipe.recipe_id)}
-                                        style={{ 
-                                            backgroundColor: recipe.status === 'Published' ? '#dcfce7' : '#fefce8',
-                                            color: recipe.status === 'Published' ? '#15803d' : '#ca8a04'
-                                        }}
-                                    >
-                                        {recipe.status === 'Published' ? '✔️' : '⏳'}
-                                    </button>
+                                    {/* NÚT DUYỆT: Chỉ hiện khi trạng thái là Draft */}
+                                    {recipe.status === 'Draft' && (
+                                        <button 
+                                            className="lock-btn approve-btn" 
+                                            title="Duyệt ngay"
+                                            onClick={() => handleApprove(recipe.recipe_id)}
+                                        >
+                                            ✔️
+                                        </button>
+                                    )}
                                     {/* Nút Xóa: icon X đỏ */}
                                     <button className="delete-btn" onClick={() => handleDelete(recipe.recipe_id)}>❌</button>
                                 </td>

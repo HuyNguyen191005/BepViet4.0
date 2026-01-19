@@ -43,11 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'store']); 
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::post('/comments', [CommentController::class, 'store']);
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user/profile', [UserController::class, 'getProfile']);
-        Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
-        // ... các route khác ...
-    });
+    Route::get('/user/profile', [UserController::class, 'getProfile']);
+    Route::patch('/recipes/{id}/trash', [RecipeController::class, 'moveToTrash']); 
+    Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
+
 });
 
 

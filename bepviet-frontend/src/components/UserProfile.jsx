@@ -4,7 +4,7 @@ import axiosClient from '../api/axiosClient';
 import './UserProfile.css';
 import { 
     User, BookOpen, Heart, ShoppingCart, Settings, 
-    LogOut, Trash2, Eye, Calendar, Edit 
+    LogOut, Clock, Trash2, CheckCircle, Eye, Calendar, Edit 
 } from 'lucide-react'; // Đã thêm icon Edit
 
 const UserProfile = () => {
@@ -85,7 +85,44 @@ const UserProfile = () => {
         navigate('/login');
         window.location.reload();
     };
-
+    // --- HÀM XỬ LÝ XÓA CÔNG THỨC (CHUYỂN VÀO THÙNG RÁC) ---
+    const handleMoveToTrash = async (recipeId) => {
+        if (window.confirm("CẢNH BÁO: Bài viết sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?")) {
+            try {
+                await axiosClient.patch(`/recipes/${recipeId}/trash`); 
+                
+                // XÓA KHỎI DANH SÁCH: Lọc bỏ bài viết vừa xóa ra khỏi mảng recipes
+                setUserData(prev => ({
+                    ...prev,
+                    recipes: prev.recipes.filter(r => r.recipe_id !== recipeId), // Xóa hẳn khỏi giao diện
+                    recipes_count: prev.recipes_count - 1 // Giảm con số tổng bài viết trên dashboard
+                }));
+    
+                alert("Đã xóa bài viết vĩnh viễn!");
+            } catch (err) {
+                alert("Không thể xóa bài viết.");
+            }
+        }
+    };
+    // --- HÀM XỬ LÝ BỎ YÊU THÍCH ---
+    const handleRemoveFavorite = async (recipeId) => {
+        if (window.confirm("Bạn có muốn bỏ món ăn này khỏi bộ sưu tập?")) {
+            try {
+                // SỬA TẠI ĐÂY: Gọi API favorite thay vì trash
+                await axiosClient.post(`/recipes/${recipeId}/favorite`); 
+                
+                // Cập nhật lại giao diện ngay lập tức
+                setUserData(prev => ({
+                    ...prev,
+                    favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId),
+                    favorites_count: (prev.favorites_count || 1) - 1
+                }));
+                alert("Đã bỏ khỏi bộ sưu tập!");
+            } catch (err) {
+                alert("Lỗi khi bỏ yêu thích.");
+            }
+        }
+    };
     if (loading) return <div className="loading">Đang tải dữ liệu...</div>;
 
     return (
@@ -159,6 +196,7 @@ const UserProfile = () => {
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
+                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img src={getImageUrl(recipe.image_url)} alt={recipe.title} />
                                         
                                         <div className="recipe-info">
@@ -172,32 +210,9 @@ const UserProfile = () => {
                                                 </span>
                                             </div>
                                         </div>
-
-                                        {/* --- CỤM NÚT THAO TÁC (SỬA / XÓA) --- */}
-                                        <div className="recipe-actions" style={{display: 'flex', gap: '8px', paddingRight: '10px'}}>
-                                            <button 
-                                                title="Xem chi tiết"
-                                                onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
-                                                style={{background:'none', border:'none', cursor:'pointer', color:'#718096'}}
-                                            >
-                                                <Eye size={20} />
-                                            </button>
-
-                                            <button 
-                                                title="Chỉnh sửa"
-                                                onClick={() => handleEditRecipe(recipe.recipe_id)}
-                                                style={{background:'none', border:'none', cursor:'pointer', color:'#3182ce'}}
-                                            >
-                                                <Edit size={20} />
-                                            </button>
-
-                                            <button 
-                                                title="Xóa bài viết"
-                                                onClick={() => handleDeleteRecipe(recipe.recipe_id)}
-                                                style={{background:'none', border:'none', cursor:'pointer', color:'#e53e3e'}}
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
+                                        <div className="recipe-meta">
+                                            <span><Eye size={14} /> {recipe.views}</span>
+                                            <button className="btn-icon-trash"><Trash2 size={16} /></button>
                                         </div>
                                     </div>
                                 ))
@@ -218,7 +233,7 @@ const UserProfile = () => {
                                 <div key={recipe.recipe_id} className="favorite-horizontal-card">
                                     <div className="favorite-left-group">
                                         <img 
-                                            src={getImageUrl(recipe.image_url)} 
+                                            src={`http://localhost:8000/storage/${recipe.image_url}`} 
                                             alt={recipe.title} 
                                             onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
                                         />
@@ -261,7 +276,7 @@ const UserProfile = () => {
                                 <label>Họ và tên</label>
                                 <input type="text" className="cr-input" defaultValue={userData?.user.full_name} style={{width: '100%', marginTop: '5px'}} />
                             </div>
-                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>Cập nhật thông tin</button>
+                            <button className="cr-btn-publish" style={{background: '#4f91a1', color: '#white', border: 'none', padding: '10px 20px', borderRadius: '5px'}}>Cập nhật thông tin</button>
                         </div>
                     </div>
                 )}

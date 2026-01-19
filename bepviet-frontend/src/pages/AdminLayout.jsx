@@ -22,6 +22,7 @@ const AdminLayout = () => {
                     {/* Sử dụng NavLink để tự động nhận class .active khi đường dẫn khớp */}
                     <NavLink to="/admin" end className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
                         <span className="icon">🏠</span> Tổng quan
+                        
                     </NavLink>
                     <NavLink to="/admin/users" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
                         <span className="icon">👥</span> Người dùng

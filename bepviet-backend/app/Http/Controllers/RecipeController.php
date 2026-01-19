@@ -252,9 +252,9 @@ public function getCategories() {
         
         // Đảo ngược trạng thái: Nếu đang 'Published' thì về 'Draft' và ngược lại
         $recipe->status = ($recipe->status === 'Published') ? 'Draft' : 'Published';
-        $recipe->save();
+        $recipe->seve();
     
         // Trả về dữ liệu đã cập nhật kèm thông tin author và categories
-        return response()->json($recipe->load(['author', 'categories']));
+        return response()->json($recipe->load(['author','categorise']));
     }
 }

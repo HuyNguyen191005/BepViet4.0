@@ -203,7 +203,7 @@ const SearchResults = () => {
                                         </div>
                                     </div>
                                 </div>
-                            )) : <p>Không tìm thấy món nào phù hợp với bộ lọc.</p>}
+                            )) : <p>Không tìm thấy món nào phù hợp vowia bộ lọc.</p>}
                         </div>
                     )}
                 </main>

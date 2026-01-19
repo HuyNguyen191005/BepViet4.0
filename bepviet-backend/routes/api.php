@@ -38,8 +38,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // API Đăng bài nằm trong này mới lấy được auth()->id()
     
     Route::post('/recipes', [RecipeController::class, 'store']);
+    Route::post('/recipes/{id}/update', [RecipeController::class, 'update']); // Sửa (Dùng POST thay PUT để upload ảnh dễ hơn)
+    Route::delete('/recipes/{id}', [RecipeController::class, 'destroy']); // Xóa
     Route::post('/posts', [PostController::class, 'store']); 
-    Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::post('/comments', [CommentController::class, 'store']);
     Route::middleware('auth:sanctum')->group(function () {

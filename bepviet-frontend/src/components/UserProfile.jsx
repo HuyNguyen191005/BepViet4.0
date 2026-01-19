@@ -4,8 +4,8 @@ import axiosClient from '../api/axiosClient';
 import './UserProfile.css';
 import { 
     User, BookOpen, Heart, ShoppingCart, Settings, 
-    LogOut, Trash2, Eye, Calendar 
-} from 'lucide-react';
+    LogOut, Trash2, Eye, Calendar, Edit 
+} from 'lucide-react'; // Đã thêm icon Edit
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -26,23 +26,52 @@ const UserProfile = () => {
             .catch(() => setLoading(false));
     }, [navigate]);
 
-    // --- HÀM XỬ LÝ URL ẢNH (FIX LỖI) ---
+    // --- HÀM XỬ LÝ URL ẢNH ---
     const getImageUrl = (url) => {
-        if (!url) return ''; // Hoặc trả về ảnh mặc định
+        if (!url) return '';
         if (url.startsWith('http')) {
-            return url; // Nếu đã có http thì giữ nguyên
+            return url;
         }
-        return `http://localhost:8000/storage/${url}`; // Nếu chưa có thì nối domain
+        return `http://localhost:8000/storage/${url}`;
     };
 
-    // --- HÀM XỬ LÝ XÓA YÊU THÍCH (Bổ sung để tránh lỗi undefined) ---
+    // --- 1. XỬ LÝ XÓA BÀI VIẾT CỦA TÔI ---
+    const handleDeleteRecipe = async (recipeId) => {
+        // Hỏi xác nhận trước khi xóa
+        if (!window.confirm("Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.")) {
+            return;
+        }
+
+        try {
+            // Gọi API xóa
+            await axiosClient.delete(`/recipes/${recipeId}`);
+            
+            // Nếu thành công, cập nhật lại State để UI tự biến mất bài đó mà không cần F5
+            setUserData(prev => ({
+                ...prev,
+                recipes: prev.recipes.filter(r => r.recipe_id !== recipeId),
+                recipes_count: prev.recipes_count - 1
+            }));
+            
+            alert("Đã xóa bài viết thành công.");
+        } catch (error) {
+            console.error(error);
+            alert("Lỗi khi xóa: " + (error.response?.data?.message || "Lỗi server"));
+        }
+    };
+
+    // --- 2. XỬ LÝ CHUYỂN TRANG SỬA ---
+    const handleEditRecipe = (recipeId) => {
+        navigate(`/recipes/edit/${recipeId}`);
+    };
+
+    // --- 3. XỬ LÝ XÓA YÊU THÍCH (BỘ SƯU TẬP) ---
     const handleRemoveFavorite = (recipeId) => {
         if(window.confirm('Bạn có chắc muốn xóa khỏi bộ sưu tập?')) {
-            // TODO: Gọi API xóa yêu thích ở đây
-            // axiosClient.post(`/favorite/remove/${recipeId}`)...
-            console.log("Xóa recipe id:", recipeId);
+            // Logic gọi API xóa yêu thích (Cần bổ sung API backend cho phần này sau)
+            console.log("Xóa recipe id khỏi fav:", recipeId);
             
-            // Tạm thời cập nhật UI giả lập
+            // Cập nhật UI giả lập
             setUserData(prev => ({
                 ...prev,
                 favorite_recipes: prev.favorite_recipes.filter(r => r.recipe_id !== recipeId)
@@ -94,9 +123,10 @@ const UserProfile = () => {
                 </nav>
             </aside>
 
-            {/* --- NỘI DUNG CHÍNH: QUẢN LÝ BÀI ĐĂNG --- */}
+            {/* --- NỘI DUNG CHÍNH --- */}
             <main className="profile-main-content">
                 
+                {/* 1. TAB QUẢN LÝ CÔNG THỨC */}
                 {activeTab === 'recipes' && (
                     <div className="tab-content">
                         <div className="stats-bar">
@@ -129,18 +159,45 @@ const UserProfile = () => {
                                 })
                                 .map(recipe => (
                                     <div key={recipe.recipe_id} className="recipe-horizontal-card">
-                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img src={getImageUrl(recipe.image_url)} alt={recipe.title} />
                                         
                                         <div className="recipe-info">
                                             <h4>{recipe.title}</h4>
-                                            <span className={`badge ${recipe.status === 'Published' ? 'badge-published' : 'badge-draft'}`}>
-                                                {recipe.status === 'Published' ? '✅ Đã duyệt' : '⏳ Chờ duyệt'}
-                                            </span>
+                                            <div style={{display:'flex', alignItems:'center', gap: '10px', marginTop:'5px'}}>
+                                                <span className={`badge ${recipe.status === 'Published' ? 'badge-published' : 'badge-draft'}`}>
+                                                    {recipe.status === 'Published' ? '✅ Đã duyệt' : '⏳ Chờ duyệt'}
+                                                </span>
+                                                <span style={{fontSize:'12px', color:'#666', display:'flex', alignItems:'center', gap:'4px'}}>
+                                                    <Eye size={14} /> {recipe.views}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="recipe-meta">
-                                            <span><Eye size={14} /> {recipe.views}</span>
-                                            <button className="btn-icon-trash"><Trash2 size={16} /></button>
+
+                                        {/* --- CỤM NÚT THAO TÁC (SỬA / XÓA) --- */}
+                                        <div className="recipe-actions" style={{display: 'flex', gap: '8px', paddingRight: '10px'}}>
+                                            <button 
+                                                title="Xem chi tiết"
+                                                onClick={() => navigate(`/recipes/${recipe.recipe_id}`)}
+                                                style={{background:'none', border:'none', cursor:'pointer', color:'#718096'}}
+                                            >
+                                                <Eye size={20} />
+                                            </button>
+
+                                            <button 
+                                                title="Chỉnh sửa"
+                                                onClick={() => handleEditRecipe(recipe.recipe_id)}
+                                                style={{background:'none', border:'none', cursor:'pointer', color:'#3182ce'}}
+                                            >
+                                                <Edit size={20} />
+                                            </button>
+
+                                            <button 
+                                                title="Xóa bài viết"
+                                                onClick={() => handleDeleteRecipe(recipe.recipe_id)}
+                                                style={{background:'none', border:'none', cursor:'pointer', color:'#e53e3e'}}
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))
@@ -149,7 +206,7 @@ const UserProfile = () => {
                     </div>
                 )}
 
-                {/* Trong phần nội dung chính, tìm đến Tab bộ sưu tập */}
+                {/* 2. TAB BỘ SƯU TẬP */}
                 {activeTab === 'collection' && (
                     <div className="tab-content">
                         <h2 className="content-title">
@@ -159,9 +216,7 @@ const UserProfile = () => {
                         <div className="favorite-list">
                             {userData?.favorite_recipes?.map(recipe => (
                                 <div key={recipe.recipe_id} className="favorite-horizontal-card">
-                                    {/* Phần bên trái: Ảnh + Thông tin */}
                                     <div className="favorite-left-group">
-                                        {/* SỬ DỤNG HÀM getImageUrl TẠI ĐÂY */}
                                         <img 
                                             src={getImageUrl(recipe.image_url)} 
                                             alt={recipe.title} 
@@ -175,7 +230,6 @@ const UserProfile = () => {
                                         </div>
                                     </div>
 
-                                    {/* NÚT XÓA: Luôn nằm ngang bên tay phải nhờ Flexbox */}
                                     <button 
                                         className="btn-remove-favorite" 
                                         onClick={() => handleRemoveFavorite(recipe.recipe_id)}

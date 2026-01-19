@@ -27,7 +27,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminRecipePanel from './pages/AdminRecipePanel';
 
 import UserProfile from './components/UserProfile';
-
+import EditRecipe from './pages/EditRecipe';
 function App() {
   const getUserInfo = () => {
     try {
@@ -72,8 +72,9 @@ function App() {
 
             {/* Thêm vào trong nhóm Route của DefaultLayout để có Header/Footer */}
             <Route index element={<Home />} />
-            <Route path="/profile" element={<UserProfile />} /> {/* DÒNG CẦN THÊM */}
-                {/* ... các route khác ... */}
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/user/profile" element={<UserProfile />} />
+            <Route path="/recipes/edit/:id" element={<EditRecipe />} /> {/* DÒNG CẦN THÊM */}
         </Route>
           {/* Nhóm trang Admin */}
           <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>

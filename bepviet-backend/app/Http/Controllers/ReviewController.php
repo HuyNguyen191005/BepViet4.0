@@ -50,7 +50,14 @@ class ReviewController extends Controller
             'content'   => $validated['content'],
             'parent_id' => $request->parent_id ?? null,
         ]);
-
+        // 3. Ghi log hoạt động nếu là đánh giá gốc (không có parent_id)
+        $recipe = \App\Models\Recipe::find($request->recipe_id);
+        \App\Models\Activity::create([
+            'user_id' => Auth::id(),
+            'username' => Auth::user()->full_name,
+            'action' => 'vừa đánh giá ' . $request->rating . ' sao cho món: ' . $recipe->title,
+            'type' => 'review' // Loại mới: review
+        ]);
         // 3. Load thêm thông tin user để trả về frontend hiển thị ngay
         $review->load('user:user_id,full_name,avatar');
 

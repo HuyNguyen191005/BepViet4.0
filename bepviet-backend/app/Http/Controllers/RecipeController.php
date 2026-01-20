@@ -361,5 +361,18 @@ class RecipeController extends Controller
             return response()->json(['message' => 'Lỗi xóa: ' . $e->getMessage()], 500);
         }
     }
+    public function moveToTrash($id) {
+    $recipe = Recipe::where('recipe_id', $id)->where('user_id', auth()->id())->first();
+    if ($recipe) {
+        \App\Models\Activity::create([
+            'user_id' => auth()->id(),
+            'username' => auth()->user()->full_name,
+            'action' => 'vừa xóa bài viết: ' . $recipe->title,
+            'type' => 'delete' // Loại mới: delete
+        ]);
+        $recipe->delete(); // Xóa cứng hoặc chuyển status tùy logic của bạn
+        
+    }
+}
     
 }

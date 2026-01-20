@@ -668,3 +668,10 @@
     background-color: #dcfce7;
     color: #16a34a;
 }
+
+/* Admin.css */
+.act-icon-box.red-bg { background-color: #fee2e2; color: #ef4444; }
+.act-icon-box.pink-bg { background-color: #fce7f3; color: #ec4899; }
+.act-icon-box.gold-bg { background-color: #fef3c7; color: #f59e0b; }
+.act-icon-box.blue-bg { background-color: #e0e7ff; color: #6366f1; } /* */
+.act-icon-box.orange-bg { background-color: #ffedd5; color: #f97316; } /* */

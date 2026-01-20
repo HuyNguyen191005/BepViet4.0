@@ -19,7 +19,7 @@ const Dashboard = () => {
         chartData: [],
         recentActivities: []
     });
-
+    
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
@@ -35,7 +35,22 @@ const Dashboard = () => {
     }, []);
 
     if (loading) return <div className="p-5 text-center">Đang tải dữ liệu...</div>;
-
+    const getActivityConfig = (type) => {
+        switch (type) {
+            case 'user': 
+                return { icon: '👤', color: 'blue-bg' };     // Đăng nhập/Đăng ký
+            case 'recipe': 
+                return { icon: '✏️', color: 'orange-bg' };   // Đăng bài
+            case 'delete': 
+                return { icon: '🗑️', color: 'red-bg' };      // MỚI: Xóa bài
+            case 'favorite': 
+                return { icon: '❤️', color: 'pink-bg' };     // MỚI: Yêu thích
+            case 'review': 
+                return { icon: '⭐', color: 'gold-bg' };     // MỚI: Đánh giá
+            default: 
+                return { icon: '🔔', color: 'gray-bg' };
+        }
+    };
     return (
         <div className="dashboard-wrapper">
             <div className="dashboard-header-card">
@@ -99,11 +114,14 @@ const Dashboard = () => {
             <div className="activity-section">
                 <div className="activity-header"><h3>🕒 Hoạt động gần đây</h3></div>
                 <div className="activity-list">
-                    {data.recentActivities && data.recentActivities.length > 0 ? (
-                        data.recentActivities.map((act, index) => (
+                    {data.recentActivities?.map((act, index) => {
+                            // Lấy config dựa trên act.type từ database
+                        const config = getActivityConfig(act.type);
+                            
+                        return (
                             <div className="activity-item" key={index}>
-                                <div className={`act-icon-box ${act.type === 'user' ? 'blue-bg' : 'orange-bg'}`}>
-                                    {act.type === 'user' ? '👤' : '✏️'}
+                                <div className={`act-icon-box ${config.color}`}>
+                                    {config.icon}
                                 </div>
                                 <div className="act-info">
                                     <p><strong>{act.username}</strong> {act.action}</p>
@@ -114,10 +132,8 @@ const Dashboard = () => {
                                     </span>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="p-4 text-center text-gray-400">Chưa có hoạt động nào được ghi nhận.</div>
-                    )}
+                        );
+                    })}
                 </div>
             </div>
         </div>

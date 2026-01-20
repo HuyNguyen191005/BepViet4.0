@@ -49,7 +49,12 @@ class DashboardController extends Controller
         }
     
         // 3. Lấy lịch sử hoạt động
-        $recentActivities = Activity::orderBy('created_at', 'desc')->take(10)->get();
+        $recentActivities = Activity::join('users', 'activities.user_id', '=', 'users.user_id')
+        ->where('users.role', '=', 'User') // Chỉ lấy role User
+        ->orderBy('activities.created_at', 'desc')
+        ->select('activities.*') // Chỉ lấy các cột của bảng activity
+        ->take(15)
+        ->get();
     
         return response()->json([
             'stats' => $stats,

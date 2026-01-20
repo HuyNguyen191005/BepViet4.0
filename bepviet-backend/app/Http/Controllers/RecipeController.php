@@ -107,6 +107,7 @@ class RecipeController extends Controller
     // 6. TẠO MÓN ĂN (STORE)
     public function store(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -132,7 +133,11 @@ class RecipeController extends Controller
                 // Nhưng nếu FE cần full link ngay thì giữ nguyên logic của bạn:
                 $imagePath = asset('storage/' . $path); 
             }
-
+           
+    
+            // Quyết định trạng thái bài viết
+            $settings = \App\Models\SystemSetting::first();
+            $status = ($settings && $settings->auto_approve_recipes) ? 'Published' : 'Draft';
             // B. Tạo Recipe
             $recipe = Recipe::create([
                 'user_id' => Auth::id() ?? 1, // Fallback ID 1 nếu chưa login (chỉ để test)
@@ -141,7 +146,7 @@ class RecipeController extends Controller
                 'cooking_time' => $request->cooking_time,
                 'difficulty' => $request->difficulty,
                 'image_url' => $imagePath,
-                'status' => 'Draft',             
+                'status' => $status, // Sử dụng biến status linh hoạt            
                 'views' => 0,
             ]);
 
@@ -204,9 +209,9 @@ class RecipeController extends Controller
             DB::commit();
             
             return response()->json([
-                'message' => 'Tạo món ăn thành công!',
+                'message' => $status === 'Published' ? 'Bài viết đã được đăng công khai!' : 'Bài viết đang chờ duyệt.',
                 'recipe' => $recipe
-            ], 201);
+            ]);
 
         } catch (\Exception $e) {
             DB::rollBack();

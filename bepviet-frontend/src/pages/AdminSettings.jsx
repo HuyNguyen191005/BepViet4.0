@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import axiosClient from '../api/axiosClient';
+import React, { useState, useEffect } from 'react';
+
 import { 
     Settings, Globe, ShieldCheck, Database, 
     Save, HardDrive, LayoutList, MessageSquare, Timer, ImagePlus, Utensils
@@ -22,6 +24,16 @@ const AdminSettings = () => {
         max_ingredients_per_recipe: 20, // 5. MỚI: Giới hạn nguyên liệu mỗi món
         footer_copyright: "© 2026 Bếp Việt 4.0. All rights reserved."
     });
+    useEffect(() => {
+        axiosClient.get('/admin/settings')
+            .then(res => {
+                setSettings({
+                    ...res.data,
+                    registration_status: res.data.allow_registration ? "open" : "close"
+                });
+            })
+            .catch(err => console.error(err));
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -31,12 +43,16 @@ const AdminSettings = () => {
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setLoading(true);
-        setTimeout(() => {
-            alert("Đã cập nhật cấu hình hệ thống thành công!");
+        try {
+            await axiosClient.post('/admin/settings', settings);
+            alert("Cập nhật cấu hình hệ thống thành công!");
+        } catch (error) {
+            alert("Lỗi: " + (error.response?.data?.message || "Không thể lưu."));
+        } finally {
             setLoading(false);
-        }, 800);
+        }
     };
 
     return (

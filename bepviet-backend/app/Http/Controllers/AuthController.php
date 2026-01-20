@@ -12,6 +12,14 @@ class AuthController extends Controller
     // 1. ĐĂNG KÝ
     public function register(Request $request)
     {
+        $settings = \App\Models\SystemSetting::first();
+
+    // Kiểm tra Quyền đăng ký
+        if (!$settings->allow_registration) {
+            return response()->json([
+                'message' => 'Hiện tại hệ thống đã đóng đăng ký thành viên mới. Vui lòng quay lại sau.'
+            ], 403);
+        }
         // Validate dữ liệu đầu vào với luật tùy chỉnh
         $fields = $request->validate([
             'username' => [
@@ -65,35 +73,49 @@ class AuthController extends Controller
             'message' => 'Đăng ký thành công! Vui lòng đăng nhập.',
             'user' => $user
         ], 201);
+
+        
     }
 
     // 2. ĐĂNG NHẬP
     public function login(Request $request) {
+        // 1. Validate dữ liệu đầu vào trước
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Tìm user theo email
+        // 2. Tìm user và kiểm tra mật khẩu
         $user = User::where('email', $request->email)->first();
 
-        // Kiểm tra password
-        // Lưu ý: So sánh password gửi lên với cột 'password_hash' trong DB
         if (!$user || !Hash::check($request->password, $user->password_hash)) {
             return response()->json([
                 'message' => 'Tài khoản hoặc mật khẩu không đúng!'
             ], 401);
         }
 
-        // Tạo token
+        // 3. KIỂM TRA BẢO TRÌ: Sau khi đã biết User đó là ai
+        $settings = \App\Models\SystemSetting::first();
+        
+        if ($settings && $settings->maintenance_mode) {
+            // Nếu ĐANG BẢO TRÌ mà người đăng nhập KHÔNG PHẢI Admin thì mới chặn
+            if ($user->role !== 'Admin') {
+                return response()->json([
+                    'message' => 'Hệ thống đang bảo trì. Vui lòng quay lại sau 15 phút.'
+                ], 503);
+            }
+        }
+
+        // 4. Nếu là Admin hoặc hệ thống không bảo trì thì cho phép tạo Token
         $token = $user->createToken('authToken')->plainTextToken;
-       // Cuối hàm login trước khi return response
+        
         Activity::create([
             'user_id' => $user->user_id,
             'username' => $user->full_name,
             'action' => 'vừa đăng nhập vào hệ thống',
             'type' => 'user'
         ]);
+
         return response()->json([
             'message' => 'Đăng nhập thành công',
             'access_token' => $token,

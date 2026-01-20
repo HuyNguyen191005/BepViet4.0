@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axiosClient from '../api/axiosClient';
-import Comments from '../components/Comments'; // <-- 1. Import Component Bình luận
-import { Heart } from 'lucide-react'; // Đảm bảo đã import
+import Comments from '../components/Comments';
+import { Heart } from 'lucide-react';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -13,7 +13,13 @@ const RecipeDetail = () => {
     useEffect(() => {
         axiosClient.get(`/recipes/${id}`)
             .then(res => {
-                setRecipe(res.data);
+                // Kiểm tra xem backend trả về 'user' hay 'author' để map dữ liệu cho đúng
+                // Gán author = user nếu backend trả về key là 'user'
+                const data = res.data;
+                if (data.user && !data.author) {
+                    data.author = data.user;
+                }
+                setRecipe(data);
                 setLoading(false);
             })
             .catch(err => {
@@ -25,13 +31,20 @@ const RecipeDetail = () => {
     if (loading) return <div style={{textAlign:'center', marginTop:'50px'}}>Đang tải món ngon...</div>;
     if (!recipe) return <div style={{textAlign:'center', marginTop:'50px'}}>Không tìm thấy món ăn!</div>;
 
-    const mainImage = recipe.image_url && recipe.image_url !== 'logo.png' ? recipe.image_url : '/default-food.jpg';
+    // Ưu tiên lấy 'recipe.image' (do Controller trả về), nếu không có mới lấy 'image_url' hoặc ảnh mặc định
+    const mainImage = recipe.image || recipe.image_url || '/default-food.jpg';
 
-    // Tính điểm trung bình rating (Hiển thị ở Header)
-    // Lưu ý: Số liệu này lấy từ lần tải trang đầu tiên
+    // XỬ LÝ AVATAR (QUAN TRỌNG)
+    // 1. Lấy link avatar từ recipe.author (hoặc recipe.user)
+    const rawAvatar = recipe.author?.avatar || recipe.user?.avatar;
+    // 2. Thêm tham số thời gian (?t=...) để chống cache trình duyệt
+    const userAvatar = rawAvatar ? `${rawAvatar}?t=${new Date().getTime()}` : '/default-avtar.png';
+
+    // Tính điểm trung bình rating
     const totalRating = recipe.reviews ? recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0) : 0;
     const avgRating = recipe.reviews && recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
     const reviewCount = recipe.reviews ? recipe.reviews.length : 0;
+
     const handleToggleFavorite = async () => {
         try {
             const res = await axiosClient.post(`/recipes/${id}/favorite`);
@@ -64,10 +77,26 @@ const RecipeDetail = () => {
                 
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                        <img src={recipe.author?.avatar && recipe.author.avatar !== 'logo.png' ? recipe.author.avatar : '/default-avatar.png'} style={{width:'40px', height:'40px', borderRadius:'50%'}} alt="Avatar" />
+                        {/* 👇 ĐÂY LÀ PHẦN SỬA LỖI ẢNH AVATAR 👇 */}
+                        <img 
+                            src={userAvatar} 
+                            style={{width:'40px', height:'40px', borderRadius:'50%', objectFit: 'cover'}} 
+                            alt="Avatar" 
+                            onError={(e) => {
+                                e.target.onerror = null; 
+                                // Lưu ý: Tên file của bạn là default-avtar.png (thiếu chữ a), mình đã sửa lại cho đúng file
+                                e.target.src = '/default-avtar.png'; 
+                            }}
+                        />
+                        {/* 👆 KẾT THÚC PHẦN SỬA 👆 */}
+
                         <div>
-                            <div style={{fontSize:'13px', color:'#666'}}>Đăng bởi: <b>{recipe.author?.full_name}</b></div>
-                            <div style={{fontSize:'12px', color:'#999'}}>Ngày: {new Date(recipe.created_at).toLocaleDateString()}</div>
+                            <div style={{fontSize:'13px', color:'#666'}}>
+                                Đăng bởi: <b>{recipe.author?.full_name || recipe.user?.full_name || 'Ẩn danh'}</b>
+                            </div>
+                            <div style={{fontSize:'12px', color:'#999'}}>
+                                Ngày: {recipe.created_at ? new Date(recipe.created_at).toLocaleDateString('vi-VN') : 'N/A'}
+                            </div>
                         </div>
                     </div>
                     <div className="recipe-header">
@@ -139,6 +168,7 @@ const RecipeDetail = () => {
                                                 borderRadius: '8px', 
                                                 display: 'block'
                                             }}
+                                            onError={(e) => e.target.style.display = 'none'}
                                         />
                                     )}
                                 </div>
@@ -150,7 +180,6 @@ const RecipeDetail = () => {
                 </div>
 
                 {/* --- PHẦN BÌNH LUẬN MỚI --- */}
-                {/* Thay thế code cũ bằng Component Comments */}
                 <div className="review-section" style={{marginTop: '40px'}}>
                     <Comments recipeId={id} />
                 </div>

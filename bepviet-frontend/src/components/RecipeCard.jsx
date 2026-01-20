@@ -1,16 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 const RecipeCard = ({ recipe }) => {
-    const imageUrl = recipe.image_url ? recipe.image_url : '/default-food.jpg';
+    // 1. XỬ LÝ ẢNH MÓN ĂN
+    // Backend trả về 'image' là full URL.
+    // Nếu 'image' null hoặc rỗng -> dùng default-food.jpg
+    const mainImage = recipe.image || '/default-food.jpg';
+
+    // 2. XỬ LÝ AVATAR USER
+    // Kiểm tra recipe.user có tồn tại không (đề phòng user bị xóa)
+    // Sau đó lấy avatar, nếu null -> dùng default-avtar.png (hoặc default-avatar.png tùy tên file bạn lưu)
+    const userAvatar = (recipe.user && recipe.user.avatar) ? recipe.user.avatar : '/default-avtar.png';
     
-    // Tạo rating giả lập vì DB chưa có bảng review (để giao diện đẹp)
+    // 3. XỬ LÝ TÊN USER
+    const userName = (recipe.user && recipe.user.full_name) ? recipe.user.full_name : 'Người dùng ẩn danh';
+
+    // Tạo rating giả lập (Giữ nguyên logic của bạn)
     const mockRating = (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1);
 
     return (
         <div className="recipe-card">
-            <Link to={`/recipes/${recipe.recipe_id}`} style={{textDecoration:'none', color:'inherit'}}>
+            {/* Link bao quanh thẻ card */}
+            <Link to={`/recipes/${recipe.recipe_id || recipe.id}`} style={{textDecoration:'none', color:'inherit'}}>
+            
             <div style={{position:'relative'}}>
-                <img src={imageUrl} alt={recipe.title} className="recipe-img" />
+                {/* ẢNH MÓN ĂN */}
+                <img 
+                    src={mainImage} 
+                    alt={recipe.title} 
+                    className="recipe-img" 
+                    // Fallback: Nếu link ảnh bị lỗi 404, tự động thay bằng ảnh mặc định
+                    onError={(e) => {
+                        e.target.onerror = null; 
+                        e.target.src = '/default-food.jpg'; 
+                    }}
+                />
                 <span style={{position:'absolute', top:'10px', right:'10px', background:'rgba(0,0,0,0.6)', color:'white', padding:'2px 8px', borderRadius:'4px', fontSize:'10px'}}>
                     ⏱ {recipe.cooking_time}p
                 </span>
@@ -26,19 +50,29 @@ const RecipeCard = ({ recipe }) => {
                     </span>
                 </div>
                 
-
                 <div className="recipe-author">
-                   <img 
-       src={recipe.user?.avatar ? `http://localhost:8000/storage/${recipe.user.avatar}` : '...link_avatar_mac_dinh...'} 
-       alt="avatar" style={{
-        width: '30px',      // Kích thước cố định
-        height: '30px',     // Kích thước cố định
-        borderRadius: '50%', // Bo tròn
-        objectFit: 'cover',  // Cắt ảnh vừa khung, không bị méo
-        marginRight: '8px'
-    }}/>
-                    <span style={{fontWeight:'500'}}>{recipe.user?.full_name || 'Đầu bếp ẩn danh'}</span>
-                    {/* Nút tim yêu thích giả lập */}
+                    {/* AVATAR TÁC GIẢ */}
+                    <img 
+                        src={userAvatar} 
+                        alt="avatar" 
+                        onError={(e) => {
+                            e.target.onerror = null; 
+                            e.target.src = '/default-avtar.png'; // Fallback nếu avatar lỗi
+                        }}
+                        style={{
+                            width: '30px',      
+                            height: '30px',     
+                            borderRadius: '50%', 
+                            objectFit: 'cover',  
+                            marginRight: '8px',
+                            border: '1px solid #eee' // Thêm viền nhẹ cho đẹp
+                        }}
+                    />
+                    {/* TÊN TÁC GIẢ */}
+                    <span style={{fontWeight:'500', fontSize: '13px'}}>
+                        {userName}
+                    </span>
+                    
                     <span style={{marginLeft:'auto', color:'#ddd', cursor:'pointer'}}>❤</span>
                 </div>
             </div>

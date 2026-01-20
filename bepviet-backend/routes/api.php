@@ -24,7 +24,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/recipes', [RecipeController::class, 'index']);
 Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/recipes/{id}', [RecipeController::class, 'show']);
-Route::get('/categories', [RecipeController::class, 'getCategories']);
+Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']);
 
 Route::get('/posts', [PostController::class, 'index']);
@@ -79,4 +79,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Cài đặt hệ thống (Duyệt bài, Bảo trì, Cấu hình kỹ thuật)
     Route::get('/admin/settings', [SettingController::class, 'getSettings']);
     Route::post('/admin/settings', [SettingController::class, 'updateSettings']);
+
+    Route::post('/admin/categories', [CategoryController::class, 'store']);
+    Route::post('/admin/categories/{id}', [CategoryController::class, 'update']); // Dùng POST + _method PUT cho ảnh
+    Route::delete('/admin/categories/{id}', [CategoryController::class, 'destroy']);
 });

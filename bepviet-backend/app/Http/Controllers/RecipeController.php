@@ -102,9 +102,9 @@ class RecipeController extends Controller
     }
 
     // 5. Lấy danh sách Categories (cho form lọc/tạo)
-    public function getCategories() {
-        return response()->json(\App\Models\Category::all());
-    }
+    // public function getCategories() {
+    //     return response()->json(\App\Models\Category::all());
+    // }
 
     // 6. TẠO MÓN ĂN (STORE)
     public function store(Request $request)

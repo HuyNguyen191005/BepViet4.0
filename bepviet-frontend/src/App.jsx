@@ -17,6 +17,7 @@ import CreateRecipe from './pages/CreateRecipe';
 
 import AdminLayout from './pages/AdminLayout';
 import AdminPanel from './pages/AdminPanel';
+import AdminCategoryPanel from './pages/AdminCategoryPanel'; // Thêm import
 
 
 import Blog from './pages/Blog';
@@ -80,18 +81,12 @@ function App() {
             <Route path="/user/profile" element={<UserProfile />} />
             <Route path="/recipes/edit/:id" element={<EditRecipe />} /> {/* DÒNG CẦN THÊM */}
         </Route>
-          {/* Nhóm trang Admin */}
-          <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
-          {/* Trang mặc định khi vào /admin là Tổng quan */}
-          <Route index element={<AdminDashboard />} />  
-          {/* Trang /admin/users hiển thị AdminPanel cũ của bạn */}
-          <Route path="users" element={<AdminPanel />} /> 
-          // Trong nhóm Route Admin
-        </Route>
+        {/* --- NHÓM 3: CÁC TRANG QUẢN TRỊ (Dùng AdminLayout) --- */}
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminPanel />} />
               <Route path="recipes" element={<AdminRecipePanel />} /> {/* THÊM DÒNG NÀY */}
+              <Route path="categories" element={<AdminCategoryPanel />} /> {/* THÊM DÒNG NÀY */}
               <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>

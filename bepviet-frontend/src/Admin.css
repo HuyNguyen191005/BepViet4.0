@@ -847,3 +847,252 @@ input:checked + .slider:before { transform: translateX(22px); }
 @media (max-width: 768px) {
     .param-grid-5 { grid-template-columns: 1fr; }
 }
+
+/* Admin.css bổ sung */
+.admin-header-master {
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+}
+
+.btn-add-large {
+    background: #2d7d8e; /* Màu teal từ thiết kế */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.cat-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cat-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    background: #f39c12; /* Màu cam icon trong thiết kế */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.btn-edit-small { color: #3498db; background: #ebf5fb; padding: 5px; border-radius: 5px; margin-right: 5px; }
+.btn-delete-small { color: #e74c3c; background: #fdedec; padding: 5px; border-radius: 5px; }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 450px;
+    border: 2px dashed #bdc3c7; /* Nét đứt như trong bản vẽ */
+}
+
+.modal-actions {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    font-family: monospace;
+}
+
+/* Chỉ áp dụng cho trang Quản lý danh mục */
+.category-management-page {
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Ép các phần tử con phải giãn ra hết chiều ngang */
+}
+
+.category-management-page .admin-header-master,
+.category-management-page .admin-card {
+    width: 100% !important; /* Ép Card và Header bung rộng 100% */
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.category-management-page .admin-table {
+    width: 100% !important; /* Ép bảng chiếm toàn bộ diện tích của Card */
+    border-collapse: collapse;
+}
+
+/* Đảm bảo các cột trong bảng dàn đều */
+.category-management-page .admin-table th:nth-child(2) {
+    width: 40%; /* Ưu tiên cột Tên danh mục rộng hơn */
+}
+
+/* Định dạng Popup Modal giống thiết kế nét đứt */
+.category-management-page .modal-content {
+    border: 2px dashed #bdc3c7; 
+    background: #f9fdfd;
+    width: 500px;
+    max-width: 90%;
+}
+
+/* --- TRANG DANH MỤC & MODAL PROMPT --- */
+
+.category-management-page .cat-img-box {
+    width: 45px;
+    height: 45px;
+    background: #f39c12; /* Màu cam mặc định */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 3px 6px rgba(243, 156, 18, 0.3);
+}
+
+.category-management-page .cat-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.badge-count {
+    background: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Modal Overlay làm mờ hậu cảnh */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px); /* Làm mờ trang web phía sau */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000;
+}
+
+/* Modal Content theo thiết kế nét đứt */
+.modal-content {
+    background: #fff;
+    width: 480px;
+    border-radius: 24px;
+    padding: 30px;
+    position: relative;
+    border: 2px dashed #94a3b8; /* Viền nét đứt như ảnh thiết kế */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Phần upload ảnh trong Modal */
+.upload-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.image-upload-label {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.image-upload-label:hover {
+    border-color: #2d7d8e;
+    background: #f0f9fa;
+}
+
+.img-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* Form inputs */
+.form-group-custom {
+    margin-bottom: 18px;
+}
+
+.form-group-custom label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.form-group-custom input,
+.form-group-custom textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group-custom input:focus {
+    border-color: #2d7d8e;
+    box-shadow: 0 0 0 3px rgba(45, 125, 142, 0.1);
+}
+
+/* Buttons chân Modal */
+.modal-footer-btns {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-modal-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 12px;
+    color: #64748b;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-modal-save {
+    flex: 2;
+    padding: 12px;
+    background: #2d7d8e;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(45, 125, 142, 0.2);
+}
+
+/* Hiệu ứng hiện Modal */
+.animate-pop {
+    animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}

@@ -154,6 +154,7 @@ if ($avatarName) {
 
         if ($request->filled('query')) {
             $query->where('title', 'like', '%' . $request->input('query') . '%');
+
         }
 
         if ($request->filled('categories')) {
@@ -172,14 +173,16 @@ if ($avatarName) {
             }
         }
 
+
+        // Lọc thời gian
         if ($request->filled('max_time')) {
-            $query->where('cooking_time', '<=', $request->input('max_time'));
+            $query->where('cooking_time','<=', $request->input('max_time'));
         }
 
         $recipes = $query->with('categories')
-                         ->withAvg('reviews', 'rating')
-                         ->withCount('reviews')
-                         ->get();
+                        ->withAvg('reviews', 'rating')
+                        ->withCount('reviews')
+                        ->get();
 
         // Format ảnh cho kết quả tìm kiếm luôn
         $formatted = $recipes->map(function($recipe){

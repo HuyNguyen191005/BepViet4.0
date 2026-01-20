@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,6 +82,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/admin/settings', [SettingController::class, 'updateSettings']);
 
     Route::post('/admin/categories', [CategoryController::class, 'store']);
-    Route::post('/admin/categories/{id}', [CategoryController::class, 'update']); // Dùng POST + _method PUT cho ảnh
+    Route::put('/admin/categories/{id}', [CategoryController::class, 'update']); // Dùng POST + _method PUT cho ảnh
     Route::delete('/admin/categories/{id}', [CategoryController::class, 'destroy']);
 });

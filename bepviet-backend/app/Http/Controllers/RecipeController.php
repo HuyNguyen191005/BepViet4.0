@@ -66,6 +66,7 @@ class RecipeController extends Controller
         // Tìm theo từ khóa
         if ($request->filled('query')) {
             $query->where('title', 'like', '%' . $request->input('query') . '%');
+
         }
 
         // Lọc Category
@@ -86,15 +87,16 @@ class RecipeController extends Controller
             }
         }
 
-        // Lọc Thời gian
+
+        // Lọc thời gian
         if ($request->filled('max_time')) {
-            $query->where('cooking_time', '<=', $request->input('max_time'));
+            $query->where('cooking_time','<=', $request->input('max_time'));
         }
 
         $recipes = $query->with('categories')
-                         ->withAvg('reviews', 'rating')
-                         ->withCount('reviews')
-                         ->get();
+                        ->withAvg('reviews', 'rating')
+                        ->withCount('reviews')
+                        ->get();
 
         return response()->json($recipes);
     }

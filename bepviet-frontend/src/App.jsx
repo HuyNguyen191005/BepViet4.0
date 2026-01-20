@@ -25,9 +25,13 @@ import CreatePost from './pages/CreatePost';
 
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRecipePanel from './pages/AdminRecipePanel';
+import AdminSettings from './pages/AdminSettings'; 
 
 import UserProfile from './components/UserProfile';
 import EditRecipe from './pages/EditRecipe';
+
+
+
 function App() {
   const getUserInfo = () => {
     try {
@@ -88,6 +92,7 @@ function App() {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminPanel />} />
               <Route path="recipes" element={<AdminRecipePanel />} /> {/* THÊM DÒNG NÀY */}
+              <Route path="settings" element={<AdminSettings />} />
         </Route>
       </Routes>
     </BrowserRouter>

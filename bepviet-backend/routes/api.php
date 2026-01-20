@@ -66,3 +66,4 @@ Route::patch('/admin/recipes/{id}/approve', [RecipeController::class, 'approve']
 Route::delete('/admin/recipes/{id}', [RecipeController::class, 'destroy']);
 // Thêm route thay đổi trạng thái bài viết
 Route::patch('/admin/recipes/{id}/status', [RecipeController::class, 'toggleStatus']);
+

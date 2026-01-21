@@ -31,7 +31,10 @@ import AdminSettings from './pages/AdminSettings';
 import UserProfile from './components/UserProfile';
 import EditRecipe from './pages/EditRecipe';
 
-
+import ForumList from './pages/ForumList';
+import ForumDetail from './pages/ForumDetail';
+import CreateForum from './pages/CreateForum';
+import ShoppingList from './pages/ShoppingList';
 
 function App() {
   const getUserInfo = () => {
@@ -80,6 +83,12 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/user/profile" element={<UserProfile />} />
             <Route path="/recipes/edit/:id" element={<EditRecipe />} /> {/* DÒNG CẦN THÊM */}
+            {/* --- NHÓM FORUM --- */}
+            <Route path="/forum" element={<ForumList />} />
+            <Route path="/forum/create" element={<CreateForum />} />
+            <Route path="/forum/:id" element={<ForumDetail />} />
+            {/* --- NHÓM SHOPPING LIST --- */}
+            <Route path="/shopping-list" element={<ShoppingList />} />
         </Route>
         {/* --- NHÓM 3: CÁC TRANG QUẢN TRỊ (Dùng AdminLayout) --- */}
         <Route path="/admin" element={user?.role === 'Admin' ? <AdminLayout /> : <Navigate to="/login" />}>

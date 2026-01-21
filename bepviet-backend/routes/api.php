@@ -11,7 +11,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
-
+use App\Http\Controllers\ForumController;
+use App\Http\Controllers\ShoppingListController;
 /*
 |--------------------------------------------------------------------------
 | API Routes - Hệ thống Bếp Việt 4.0
@@ -32,8 +33,14 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{id}', [PostController::class, 'show']);
 Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
 Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
+// Ai cũng xem được
+Route::get('/forum', [ForumController::class, 'index']);
+Route::get('/forum/{id}', [ForumController::class, 'show']);
+// Route thêm nhiều món
+Route::post('shopping-list/bulk', [ShoppingListController::class, 'bulkStore']);
 
-
+// Route xem, xóa, sửa
+Route::resource('shopping-list', ShoppingListController::class);
 // --- NHÓM 2: ROUTE NGƯỜI DÙNG (Cần Token & Bị chặn khi bật Bảo trì) ---
 // Nhóm này áp dụng 'check.maintenance' để chặn User khi Admin đang sửa hệ thống
 Route::middleware(['auth:sanctum', 'check.maintenance'])->group(function () {
@@ -55,6 +62,8 @@ Route::middleware(['auth:sanctum', 'check.maintenance'])->group(function () {
     
     // Quản lý Blog cá nhân
     Route::post('/posts', [PostController::class, 'store']);
+    Route::post('/forum', [ForumController::class, 'store']);
+    Route::post('/forum/{id}/comment', [ForumController::class, 'reply']);
 });
 
 

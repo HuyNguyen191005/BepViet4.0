@@ -235,7 +235,12 @@ body {
 .nav-item:hover, .nav-item.active {
   color: #f59e0b; /* Hover màu cam */
 }
-
+.nav-link {
+    padding-left: 10px !important;  /* Mặc định có thể là 15px hoặc 20px */
+    padding-right: 10px !important;
+    font-size: 15px; /* Giảm nhẹ cỡ chữ nếu cần */
+    white-space: nowrap; /* Áp dụng cho toàn bộ menu để không cái nào bị xuống dòng */
+}
 /* --- 3. KHU VỰC PHẢI (SEARCH & USER) --- */
 .header-right {
   display: flex;
@@ -2192,4 +2197,408 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
     background-color: #f9f9f9;
+}
+/* =========================================
+   FORUM STYLES (CỘNG ĐỒNG)
+   ========================================= */
+
+/* --- BIẾN MÀU SẮC (Dùng chung cho Forum) --- */
+:root {
+  --forum-primary: #ff8c00; /* Màu cam chủ đạo */
+  --forum-primary-hover: #e07b00;
+  --forum-bg-light: #f9f9f9;
+  --forum-radius: 12px;
+}
+
+/* --- KHUNG BAO NGOÀI --- */
+.forum-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2d3436;
+}
+
+/* Header & Tiêu đề */
+.forum-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 15px;
+}
+
+.forum-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3436;
+}
+
+/* Nút bấm (Button) */
+.btn-primary-custom {
+  background-color: var(--forum-primary);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--forum-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+  color: #fff;
+}
+
+/* --- DANH SÁCH BÀI VIẾT --- */
+.forum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.forum-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: var(--forum-radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.forum-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--forum-primary);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2d3436;
+}
+
+.card-desc {
+  color: #636e72;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #888;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 10px;
+}
+
+/* --- CHI TIẾT BÀI VIẾT --- */
+.post-detail-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: var(--forum-radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.post-meta-header {
+  font-size: 14px;
+  color: #636e72;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  background: #eee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--forum-primary);
+  overflow: hidden; /* Cắt ảnh thừa nếu ảnh vuông */
+  flex-shrink: 0;   /* Không bị méo khi co giãn */
+  border: 1px solid #ddd;
+}
+
+/* Thêm class này cho thẻ img bên trong */
+.author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Giúp ảnh luôn lấp đầy hình tròn mà không bị méo */
+}
+
+.post-content-body {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* --- BÌNH LUẬN --- */
+.comments-section {
+  margin-top: 40px;
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.comment-item {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+  border-left: 4px solid var(--forum-primary);
+}
+
+.comment-author {
+  font-weight: bold;
+  font-size: 14px;
+  color: #2d3436;
+  margin-bottom: 5px;
+}
+
+/* Form nhập liệu */
+.reply-form textarea, 
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border 0.3s;
+  font-family: inherit;
+}
+
+.reply-form textarea:focus, 
+.form-input:focus {
+  border-color: var(--forum-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2d3436;
+}
+
+--shopping cart styles--
+/* --- CREATE RECIPE PAGE STYLES --- */
+/* Container chính căn giữa */
+.shopping-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Khung thẻ bao quanh */
+.shopping-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden; /* Để bo tròn góc không bị header che mất */
+    border: 1px solid #f0f0f0;
+}
+
+/* Phần tiêu đề màu cam */
+.shopping-header {
+    background: linear-gradient(135deg, #ff8c00 0%, #ffb347 100%);
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.shopping-header h4 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Badge đếm số lượng */
+.badge-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Danh sách món ăn */
+.shopping-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Từng dòng món ăn */
+.shopping-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 25px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.shopping-item:hover {
+    background-color: #fff9f0; /* Màu cam siêu nhạt khi hover */
+}
+
+.shopping-item:last-child {
+    border-bottom: none;
+}
+
+/* Phần nội dung bên trái (Icon + Tên) */
+.item-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+/* Vòng tròn checkbox tùy chỉnh */
+.check-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0; /* Không bị méo khi tên dài */
+}
+
+/* Trạng thái khi đã mua */
+.shopping-item.bought {
+    background-color: #fafafa;
+}
+
+.shopping-item.bought .check-circle {
+    background-color: #28a745; /* Màu xanh lá */
+    border-color: #28a745;
+}
+
+.shopping-item.bought .item-info {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+/* Tên món và số lượng */
+.item-info h6 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.item-info small {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Nút xóa */
+.btn-delete {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    opacity: 0; /* Ẩn bình thường */
+    transition: all 0.2s;
+}
+
+.shopping-item:hover .btn-delete {
+    opacity: 1; /* Hiện khi hover vào dòng */
+}
+
+.btn-delete:hover {
+    background-color: #ffe6e6;
+}
+
+/* Trạng thái trống */
+.empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: #999;
+}
+
+.btn-find-recipe {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: white;
+    border: 2px solid #ff8c00;
+    color: #ff8c00;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.btn-find-recipe:hover {
+    background: #ff8c00;
+    color: white;
+}
+
+/* Footer xóa tất cả */
+.card-footer {
+    padding: 15px 25px;
+    background: #fdfdfd;
+    border-top: 1px solid #f0f0f0;
+    text-align: right;
+}
+
+.btn-clear-all {
+    background: none;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-clear-all:hover {
+    background: #ff4d4d;
+    color: white;
 }

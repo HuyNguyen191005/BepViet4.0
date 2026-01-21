@@ -94,6 +94,7 @@ const Home = () => {
             </div>
 
             {/* 5. CỘNG ĐỒNG VỪA NẤU GÌ? */}
+           <Link to="/blog">
             <div style={{maxWidth: '1200px', margin: '0 auto'}}>
                 <h2 className="section-title" style={{borderColor:'#22c55e'}}>CỘNG ĐỒNG VỪA NẤU GÌ?</h2>
                 <div className="community-section">
@@ -109,7 +110,7 @@ const Home = () => {
                             <p style={{fontSize:'14px', marginTop:'5px', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>Hôm nay trời mưa, mình làm món này cho cả nhà. Bí quyết nằm ở phần nước cốt me và sả phi thơm...</p>
                         </div>
                     </div>
-
+           
                     {/* List nhỏ bên phải */}
                     <div className="comm-right">
                         <div className="comm-card">
@@ -136,6 +137,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
+             </Link>
         </div>
     );
 };

@@ -10,16 +10,30 @@ const RecipeDetail = () => {
     const [loading, setLoading] = useState(true);
     const [isFavorited, setIsFavorited] = useState(false);
 
+    // STATE MỚI: Danh sách nguyên liệu được chọn để mua
+    const [selectedIngredients, setSelectedIngredients] = useState([]);
+
     useEffect(() => {
         axiosClient.get(`/recipes/${id}`)
             .then(res => {
-                // Kiểm tra xem backend trả về 'user' hay 'author' để map dữ liệu cho đúng
-                // Gán author = user nếu backend trả về key là 'user'
                 const data = res.data;
+                // Map author nếu backend trả về user
                 if (data.user && !data.author) {
                     data.author = data.user;
                 }
                 setRecipe(data);
+                
+                // --- LOGIC MỚI: Tự động chọn tất cả nguyên liệu khi load trang ---
+                if (data.ingredients && data.ingredients.length > 0) {
+                    const allIngredients = data.ingredients.map(ing => ({
+                        name: ing.name,
+                        // Ghép số lượng và đơn vị thành chuỗi (VD: "500 gram")
+                        quantity: `${ing.pivot?.quantity || ''} ${ing.pivot?.unit || ''}`.trim()
+                    }));
+                    setSelectedIngredients(allIngredients);
+                }
+                // ----------------------------------------------------------------
+
                 setLoading(false);
             })
             .catch(err => {
@@ -28,22 +42,44 @@ const RecipeDetail = () => {
             });
     }, [id]);
 
-    if (loading) return <div style={{textAlign:'center', marginTop:'50px'}}>Đang tải món ngon...</div>;
-    if (!recipe) return <div style={{textAlign:'center', marginTop:'50px'}}>Không tìm thấy món ăn!</div>;
+    // --- HÀM MỚI: Xử lý khi tick vào checkbox ---
+    const handleCheckboxChange = (item) => {
+        const itemQuantity = `${item.pivot?.quantity || ''} ${item.pivot?.unit || ''}`.trim();
+        const isSelected = selectedIngredients.some(i => i.name === item.name);
 
-    // Ưu tiên lấy 'recipe.image' (do Controller trả về), nếu không có mới lấy 'image_url' hoặc ảnh mặc định
-    const mainImage = recipe.image || recipe.image_url || '/default-food.jpg';
+        if (isSelected) {
+            // Nếu đang chọn -> Bỏ ra khỏi danh sách
+            setSelectedIngredients(selectedIngredients.filter(i => i.name !== item.name));
+        } else {
+            // Nếu chưa chọn -> Thêm vào
+            setSelectedIngredients([...selectedIngredients, {
+                name: item.name,
+                quantity: itemQuantity
+            }]);
+        }
+    };
 
-    // XỬ LÝ AVATAR (QUAN TRỌNG)
-    // 1. Lấy link avatar từ recipe.author (hoặc recipe.user)
-    const rawAvatar = recipe.author?.avatar || recipe.user?.avatar;
-    // 2. Thêm tham số thời gian (?t=...) để chống cache trình duyệt
-    const userAvatar = rawAvatar ? `${rawAvatar}?t=${new Date().getTime()}` : '/default-avtar.png';
+    // --- HÀM MỚI: Gửi danh sách đi chợ lên Server ---
+    const handleAddToShoppingList = async () => {
+        if (selectedIngredients.length === 0) {
+            alert("Bạn chưa chọn nguyên liệu nào!");
+            return;
+        }
 
-    // Tính điểm trung bình rating
-    const totalRating = recipe.reviews ? recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0) : 0;
-    const avgRating = recipe.reviews && recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
-    const reviewCount = recipe.reviews ? recipe.reviews.length : 0;
+        try {
+            await axiosClient.post('/shopping-list/bulk', {
+                items: selectedIngredients
+            });
+            alert(`Đã thêm ${selectedIngredients.length} món vào danh sách đi chợ thành công!`);
+        } catch (err) {
+            console.error(err);
+            if (err.response && err.response.status === 401) {
+                alert("Vui lòng đăng nhập để sử dụng tính năng đi chợ!");
+            } else {
+                alert("Có lỗi xảy ra, vui lòng thử lại sau.");
+            }
+        }
+    };
 
     const handleToggleFavorite = async () => {
         try {
@@ -54,6 +90,17 @@ const RecipeDetail = () => {
             alert("Vui lòng đăng nhập để thực hiện chức năng này!");
         }
     };
+
+    if (loading) return <div style={{textAlign:'center', marginTop:'50px'}}>Đang tải món ngon...</div>;
+    if (!recipe) return <div style={{textAlign:'center', marginTop:'50px'}}>Không tìm thấy món ăn!</div>;
+
+    const mainImage = recipe.image || recipe.image_url || '/default-food.jpg';
+    const rawAvatar = recipe.author?.avatar || recipe.user?.avatar;
+    const userAvatar = rawAvatar ? `${rawAvatar}?t=${new Date().getTime()}` : '/default-avtar.png';
+
+    const totalRating = recipe.reviews ? recipe.reviews.reduce((acc, curr) => acc + curr.rating, 0) : 0;
+    const avgRating = recipe.reviews && recipe.reviews.length ? (totalRating / recipe.reviews.length).toFixed(1) : 0;
+    const reviewCount = recipe.reviews ? recipe.reviews.length : 0;
     
     return (
         <div style={{background: '#f8f9fa', minHeight: '100vh', paddingBottom: '50px'}}>
@@ -66,7 +113,7 @@ const RecipeDetail = () => {
                 <span style={{fontSize:'13px', color:'#888'}}>
                     <Link to="/" style={{color:'#888', textDecoration:'none'}}>Trang chủ</Link> 
                     {' / '}
-                    <Link to="/mon-chay" style={{color:'#888', textDecoration:'none'}}>Món Chay</Link> 
+                    <Link to="/mon-chay" style={{color:'#888', textDecoration:'none'}}>Công thức</Link> 
                     {' / '}
                     <b>{recipe.title}</b>
                 </span>
@@ -77,18 +124,15 @@ const RecipeDetail = () => {
                 
                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
-                        {/* 👇 ĐÂY LÀ PHẦN SỬA LỖI ẢNH AVATAR 👇 */}
                         <img 
                             src={userAvatar} 
                             style={{width:'40px', height:'40px', borderRadius:'50%', objectFit: 'cover'}} 
                             alt="Avatar" 
                             onError={(e) => {
                                 e.target.onerror = null; 
-                                // Lưu ý: Tên file của bạn là default-avtar.png (thiếu chữ a), mình đã sửa lại cho đúng file
                                 e.target.src = '/default-avtar.png'; 
                             }}
                         />
-                        {/* 👆 KẾT THÚC PHẦN SỬA 👆 */}
 
                         <div>
                             <div style={{fontSize:'13px', color:'#666'}}>
@@ -100,16 +144,14 @@ const RecipeDetail = () => {
                         </div>
                     </div>
                     <div className="recipe-header">
-               
-                {/* NÚT LIKE HÌNH TRÁI TIM */}
-                <button 
-                onClick={handleToggleFavorite}
-                className={`btn-heart-like ${isFavorited ? 'active' : ''}`}
-            >
-                <Heart size={25} fill={isFavorited ? "#e53e3e" : "none"} strokeWidth={2.5} />
-                <span>{isFavorited ? 'Đã lưu' : 'Yêu thích'}</span>
-                </button>
-                </div>  
+                        <button 
+                            onClick={handleToggleFavorite}
+                            className={`btn-heart-like ${isFavorited ? 'active' : ''}`}
+                        >
+                            <Heart size={25} fill={isFavorited ? "#e53e3e" : "none"} strokeWidth={2.5} />
+                            <span>{isFavorited ? 'Đã lưu' : 'Yêu thích'}</span>
+                        </button>
+                    </div>  
                     <div>
                         <span style={{color:'#f59e0b', fontSize:'18px'}}>★ {avgRating} ({reviewCount} đánh giá)</span>
                     </div>
@@ -127,16 +169,31 @@ const RecipeDetail = () => {
                 <div className="detail-desc">"{recipe.description}"</div>
 
                 <div className="detail-content">
-                    {/* CỘT NGUYÊN LIỆU */}
+                    {/* CỘT NGUYÊN LIỆU (ĐÃ SỬA ĐỔI) */}
                     <div className="ingredients-box">
                         <div className="ing-header">🛒 NGUYÊN LIỆU</div>
-                        <button className="btn-add-cart">+ Thêm vào giỏ</button>
-                        <div className="ing-list">
+                        
+                        {/* Nút thêm vào giỏ có hiển thị số lượng */}
+                        <button 
+                            className="btn-add-cart" 
+                            onClick={handleAddToShoppingList}
+                            style={{background: '#ff8c00', color: 'white', border: 'none', padding: '10px', width: '100%', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold'}}
+                        >
+                            + Thêm vào giỏ đi chợ ({selectedIngredients.length})
+                        </button>
+
+                        <div className="ing-list" style={{marginTop: '15px'}}>
                             {recipe.ingredients && recipe.ingredients.map((item, index) => (
-                                <div key={index} style={{padding:'10px 0', borderBottom:'1px solid #eee', display:'flex', justifyContent:'space-between'}}>
-                                    <span>
-                                        <input type="checkbox" style={{marginRight:'10px'}} /> 
-                                        <b>{item.name}</b>
+                                <div key={index} style={{padding:'10px 0', borderBottom:'1px solid #eee', display:'flex', justifyContent:'space-between', alignItems: 'center'}}>
+                                    <span style={{display: 'flex', alignItems: 'center'}}>
+                                        <input 
+                                            type="checkbox" 
+                                            style={{marginRight:'10px', width: '18px', height: '18px', cursor: 'pointer'}} 
+                                            // Kiểm tra xem món này có trong mảng đã chọn không
+                                            checked={selectedIngredients.some(i => i.name === item.name)}
+                                            onChange={() => handleCheckboxChange(item)}
+                                        /> 
+                                        <b style={{cursor: 'pointer'}} onClick={() => handleCheckboxChange(item)}>{item.name}</b>
                                     </span>
                                     <span style={{color:'#666'}}>
                                         {item.pivot.quantity} {item.pivot.unit}

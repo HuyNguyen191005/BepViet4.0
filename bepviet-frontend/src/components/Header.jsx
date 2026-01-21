@@ -68,8 +68,10 @@ export default function Header() {
                 <nav className="header-center">
                     <Link to="/" className="nav-item active">Trang chủ</Link>
                     <Link to="/recipes" className="nav-item">Công thức</Link>
-                    <Link to="/community" className="nav-item">Cộng đồng</Link>
+                    <Link to="/forum" className="nav-item">Cộng đồng</Link>
                     <Link to="/blog" className="nav-item">Blog</Link>
+                    <Link to="/shopping-list" className="nav-item" >Đi chợ</Link>
+                   
                 </nav>
 
                 {/* 3. KHU VỰC TÌM KIẾM & USER */}

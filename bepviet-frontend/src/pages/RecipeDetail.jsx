@@ -81,16 +81,38 @@ const RecipeDetail = () => {
         }
     };
 
-    const handleToggleFavorite = async () => {
+const handleToggleFavorite = async () => {
+        // 1. Kiểm tra: Phải chờ recipe load xong và có ID thì mới được chạy
+        // (Tránh trường hợp người dùng bấm quá nhanh khi trang chưa tải xong)
+        if (!recipe || !recipe.recipe_id) {
+            console.log("Đang tải dữ liệu, chưa thể like...");
+            return;
+        }
+
         try {
-            const res = await axiosClient.post(`/recipes/${id}/favorite`);
-            setIsFavorited(res.data.is_favorited);
-            alert(res.data.is_favorited ? "Đã thêm vào bộ sưu tập!" : "Đã xóa khỏi bộ sưu tập!");
+            // 2. SỬA ĐOẠN NÀY:
+            // CŨ (Sai): post(`/recipes/${id}/favorite`) -> Gửi chữ "goi-cuon" -> Lỗi
+            // MỚI (Đúng): post(`/recipes/${recipe.recipe_id}/favorite`) -> Gửi số (ví dụ: 15)
+            
+            const res = await axiosClient.post(`/recipes/${recipe.recipe_id}/favorite`);
+            
+            // 3. Cập nhật giao diện
+            // Kiểm tra kỹ xem backend trả về key là 'liked' hay 'is_favorited'
+            // (Theo code cũ bạn gửi thì là 'liked')
+            setIsFavorited(res.data.liked ?? res.data.is_favorited); 
+            
+            alert(res.data.message);
+
         } catch (err) {
-            alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+            console.error(err);
+            // Nếu lỗi 401 (Unauthorized) thì báo đăng nhập
+            if (err.response && err.response.status === 401) {
+                alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+            } else {
+                alert("Có lỗi xảy ra: " + (err.response?.data?.message || err.message));
+            }
         }
     };
-
     if (loading) return <div style={{textAlign:'center', marginTop:'50px'}}>Đang tải món ngon...</div>;
     if (!recipe) return <div style={{textAlign:'center', marginTop:'50px'}}>Không tìm thấy món ăn!</div>;
 

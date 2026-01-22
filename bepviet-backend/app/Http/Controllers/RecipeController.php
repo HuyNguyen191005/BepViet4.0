@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Recipe;
 use App\Models\Category;
@@ -17,16 +17,26 @@ class RecipeController extends Controller
     // ======================================================
     // 1. LẤY DANH SÁCH (TRANG CHỦ)
     // ======================================================
-    public function index()
+public function index()
     {
+        // 1. Lấy dữ liệu từ DB (Code của bạn giữ nguyên, rất chuẩn)
         $recipes = Recipe::with('user')
             ->where('status', 'Published')
             ->orderBy('created_at', 'desc')
             ->take(8)
             ->get();
 
+        // 2. Format dữ liệu (SỬA ĐOẠN NÀY)
         $formattedRecipes = $recipes->map(function ($recipe) {
-            return $this->formatRecipeData($recipe);
+            // Gọi hàm format cũ để lấy các trường cơ bản (id, title, image...)
+            $data = $this->formatRecipeData($recipe); 
+            
+            // --- BỔ SUNG THỦ CÔNG ---
+            // Ép buộc thêm trường 'slug' vào mảng kết quả
+            // Nếu DB chưa có slug thì nó sẽ là null, không gây lỗi code
+            $data['slug'] = $recipe->slug; 
+
+            return $data;
         });
 
         return response()->json($formattedRecipes);
@@ -35,19 +45,22 @@ class RecipeController extends Controller
     // ======================================================
     // 2. CHI TIẾT MÓN ĂN (SHOW) - Đã fix lỗi ảnh và ID
     // ======================================================
-    public function show($id)
+public function show($id)
     {
-        // Dùng where recipe_id để chắc chắn tìm đúng cột
+        // --- [NEW] LOGIC TÌM KIẾM ---
+        // Tìm theo recipe_id HOẶC tìm theo slug
         $recipe = Recipe::with(['user', 'steps', 'ingredients', 'reviews.user'])
-            ->where('recipe_id', $id)
+            ->where(function($query) use ($id) {
+                $query->where('recipe_id', $id)
+                      ->orWhere('slug', $id);
+            })
             ->first();
 
         if (!$recipe) {
             return response()->json(['message' => 'Không tìm thấy món ăn'], 404);
         }
 
-        // Tái sử dụng hàm format dữ liệu để đảm bảo ảnh hiển thị đúng như trang chủ
-        // Tuy nhiên, trang chi tiết cần nhiều info hơn (steps, ingredients) nên ta merge thêm vào
+        // Tái sử dụng hàm format dữ liệu
         $basicData = $this->formatRecipeData($recipe);
         
         $detailData = array_merge($basicData, [
@@ -55,14 +68,13 @@ class RecipeController extends Controller
             'servings' => $recipe->servings,
             'ingredients' => $recipe->ingredients,
             'steps' => $recipe->steps->map(function($step) {
-                // Xử lý ảnh cho từng bước (Step) nếu có
                 if ($step->image_url && !str_contains($step->image_url, 'http')) {
                     $cleanStepImg = str_replace('storage/', '', $step->image_url);
                     $step->image_url = asset('storage/' . $cleanStepImg);
                 }
                 return $step;
             }),
-            'reviews' => $recipe->reviews // Nếu cần format user trong review thì map thêm
+            'reviews' => $recipe->reviews 
         ]);
 
         return response()->json($detailData);
@@ -205,7 +217,7 @@ if ($avatarName) {
     // ======================================================
     // 6. TẠO MÓN ĂN (STORE)
     // ======================================================
-    public function store(Request $request)
+public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
@@ -213,9 +225,6 @@ if ($avatarName) {
             'cooking_time' => 'required|integer',
             'difficulty' => 'required|in:Dễ,Trung bình,Khó',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            // 'category_ids' => 'required', 
-            // 'ingredients' => 'required',
-            // 'steps' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -227,22 +236,28 @@ if ($avatarName) {
             // A. Upload ảnh chính
             $imagePath = null;
             if ($request->hasFile('image')) {
-                // Lưu file vào thư mục public/recipes
                 $path = $request->file('image')->store('recipes', 'public');
-                // LƯU Ý: Lưu đường dẫn ngắn gọn vào DB, khi hiển thị mới dùng asset()
-                // Nhưng để tương thích với dữ liệu cũ của bạn, mình sẽ lưu tạm tên file
-                // $imagePath = $path; 
-                // HOẶC theo cách cũ của bạn (lưu full path):
-                $imagePath = 'storage/' . $path; // Lưu ý mình bỏ asset() ở đây để tránh cứng domain
+                $imagePath = 'storage/' . $path; 
             }
             
             $settings = \App\Models\SystemSetting::first();
             $status = ($settings && $settings->auto_approve_recipes) ? 'Published' : 'Draft';
             
+            // --- [NEW] XỬ LÝ SLUG ---
+            // 1. Tạo slug từ tiêu đề
+            $slug = Str::slug($request->title);
+            
+            // 2. Kiểm tra trùng lặp (Nếu đã có slug này thì thêm timestamp vào đuôi)
+            if (Recipe::where('slug', $slug)->exists()) {
+                $slug = $slug . '-' . time();
+            }
+            // ------------------------
+
             // B. Tạo Recipe
             $recipe = Recipe::create([
                 'user_id' => Auth::id() ?? 1, 
                 'title' => $request->title,
+                'slug' => $slug, // <-- [NEW] Lưu slug vào DB
                 'description' => $request->description,
                 'cooking_time' => $request->cooking_time,
                 'difficulty' => $request->difficulty,
@@ -269,26 +284,21 @@ if ($avatarName) {
             // E. Xử lý Steps
             if ($request->has('steps')) {
                 $stepsData = $request->steps; 
-                // Mẹo: Nếu gửi FormData, steps là mảng các chuỗi JSON nếu không decode khéo
-                // Ở đây mình giả định cấu trúc chuẩn
-                // Nếu FE gửi steps là string JSON tổng:
                 if (is_string($stepsData)) $stepsData = json_decode($stepsData, true);
 
                 foreach ($stepsData as $index => $stepData) {
                     $stepImagePath = null;
                     
-                    // Kiểm tra nếu có file ảnh cho bước này
                     if ($request->hasFile("steps.$index.image")) {
                         $file = $request->file("steps.$index.image");
                         $path = $file->store('steps', 'public');
                         $stepImagePath = 'storage/' . $path;
                     }
 
-                    // Content có thể nằm trong mảng hoặc là string
                     $content = is_array($stepData) ? ($stepData['content'] ?? '') : $stepData;
 
                     Step::create([
-                        'recipe_id' => $recipe->recipe_id, // Lấy ID vừa tạo
+                        'recipe_id' => $recipe->recipe_id,
                         'step_order' => $index + 1,
                         'content' => $content,
                         'image_url' => $stepImagePath
@@ -298,7 +308,7 @@ if ($avatarName) {
 
             // F. Log
             Activity::create([
-                'user_id'  => Auth::id() ?? 1,
+                'user_id'   => Auth::id() ?? 1,
                 'username' => Auth::user() ? Auth::user()->full_name : 'Admin',
                 'action'   => 'vừa đăng một công thức mới: ' . $recipe->title,
                 'type'     => 'recipe'
@@ -348,16 +358,35 @@ if ($avatarName) {
     // ======================================================
     // 8. YÊU THÍCH
     // ======================================================
-    public function toggleFavorite($id) {
-        $user = Auth::user();
-        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+public function toggleFavorite(Request $request, $id) 
+    {
+        $incomingId = $id; 
+        $realRecipe = null;
 
-        // toggle cần ID của recipe, Laravel tự xử lý bảng trung gian
-        $status = $user->favorites()->toggle($id);
+        // --- SỬA ĐOẠN NÀY ---
+        if (is_numeric($incomingId)) {
+            // Chỉ tìm theo recipe_id (vì bảng bạn không có cột id)
+            $realRecipe = Recipe::where('recipe_id', $incomingId)->first();
+        } else {
+            // Tìm theo slug
+            $realRecipe = Recipe::where('slug', $incomingId)->first();
+        }
+        // --------------------
+
+        if (!$realRecipe) {
+            return response()->json(['message' => 'Không tìm thấy món ăn'], 404);
+        }
+
+        $user = auth()->user();
+        
+        // Toggle với ID thật
+        $result = $user->favorites()->toggle($realRecipe->recipe_id);
+
+        $isLiked = count($result['attached']) > 0;
         
         return response()->json([
-            'is_favorited' => count($status['attached']) > 0,
-            'message' => 'Cập nhật bộ sưu tập thành công'
+            'message' => $isLiked ? 'Đã thêm vào yêu thích' : 'Đã bỏ yêu thích',
+            'liked'   => $isLiked
         ]);
     }
 

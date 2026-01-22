@@ -2,26 +2,38 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const RecipeCard = ({ recipe }) => {
-    // 1. XỬ LÝ ẢNH MÓN ĂN
-    // Backend trả về 'image' là full URL.
-    // Nếu 'image' null hoặc rỗng -> dùng default-food.jpg
-    const mainImage = recipe.image || '/default-food.jpg';
+    // 1. XỬ LÝ ĐƯỜNG DẪN (QUAN TRỌNG)
+    // Nếu có slug -> /recipes/ga-luoc-la-chanh
+    // Nếu chưa có slug -> /recipes/15
+    const linkUrl = `/recipes/${recipe.slug ? recipe.slug : (recipe.recipe_id || recipe.id)}`;
 
-    // 2. XỬ LÝ AVATAR USER
-    // Kiểm tra recipe.user có tồn tại không (đề phòng user bị xóa)
-    // Sau đó lấy avatar, nếu null -> dùng default-avtar.png (hoặc default-avatar.png tùy tên file bạn lưu)
-    const userAvatar = (recipe.user && recipe.user.avatar) ? recipe.user.avatar : '/default-avtar.png';
+    // 2. XỬ LÝ ẢNH MÓN ĂN
+    // Backend Laravel trả về 'image_url'. 
+    // Nếu ảnh là đường dẫn tương đối (storage/...), cần thêm domain localhost vào trước.
+    let imgSource = recipe.image_url || recipe.image; 
     
-    // 3. XỬ LÝ TÊN USER
-    const userName = (recipe.user && recipe.user.full_name) ? recipe.user.full_name : 'Người dùng ẩn danh';
+    if (imgSource && !imgSource.includes('http')) {
+        imgSource = `http://localhost:8000/${imgSource}`;
+    }
+    
+    const mainImage = imgSource || '/default-food.jpg';
 
-    // Tạo rating giả lập (Giữ nguyên logic của bạn)
+    // 3. XỬ LÝ AVATAR USER
+    const userAvatar = (recipe.user && recipe.user.avatar) 
+        ? (recipe.user.avatar.includes('http') ? recipe.user.avatar : `http://localhost:8000/${recipe.user.avatar}`) 
+        : '/default-avtar.png';
+    
+    // 4. XỬ LÝ TÊN USER
+    // Hỗ trợ cả cấu trúc 'user' (Laravel) hoặc 'author' (nếu bạn có map dữ liệu khác)
+    const userName = recipe.user?.full_name || recipe.author?.full_name || 'Đầu bếp ẩn danh';
+
+    // Tạo rating giả lập
     const mockRating = (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1);
 
     return (
         <div className="recipe-card">
-            {/* Link bao quanh thẻ card */}
-            <Link to={`/recipes/${recipe.recipe_id || recipe.id}`} style={{textDecoration:'none', color:'inherit'}}>
+            {/* Link bao quanh thẻ card với đường dẫn URL Slug */}
+            <Link to={linkUrl} style={{textDecoration:'none', color:'inherit'}}>
             
             <div style={{position:'relative'}}>
                 {/* ẢNH MÓN ĂN */}
@@ -29,7 +41,6 @@ const RecipeCard = ({ recipe }) => {
                     src={mainImage} 
                     alt={recipe.title} 
                     className="recipe-img" 
-                    // Fallback: Nếu link ảnh bị lỗi 404, tự động thay bằng ảnh mặc định
                     onError={(e) => {
                         e.target.onerror = null; 
                         e.target.src = '/default-food.jpg'; 
@@ -57,7 +68,7 @@ const RecipeCard = ({ recipe }) => {
                         alt="avatar" 
                         onError={(e) => {
                             e.target.onerror = null; 
-                            e.target.src = '/default-avtar.png'; // Fallback nếu avatar lỗi
+                            e.target.src = '/default-avtar.png';
                         }}
                         style={{
                             width: '30px',      
@@ -65,7 +76,7 @@ const RecipeCard = ({ recipe }) => {
                             borderRadius: '50%', 
                             objectFit: 'cover',  
                             marginRight: '8px',
-                            border: '1px solid #eee' // Thêm viền nhẹ cho đẹp
+                            border: '1px solid #eee'
                         }}
                     />
                     {/* TÊN TÁC GIẢ */}

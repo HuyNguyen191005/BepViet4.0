@@ -13,7 +13,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ShoppingListController;
-
+use App\Http\Controllers\UtilityController;
 /*
 |--------------------------------------------------------------------------
 | API ROUTES - BẾP VIỆT 4.0
@@ -45,7 +45,16 @@ Route::get('/forum/{id}', [ForumController::class, 'show']);
 // Reviews
 Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
 
-
+//  Nhóm API Tiện ích 
+Route::get('/utils/random-recipe', [UtilityController::class, 'randomRecipe']); 
+Route::get('/utils/stats', [UtilityController::class, 'systemStats']);          
+Route::get('/utils/top-users', [UtilityController::class, 'topUsers']);         
+Route::get('/utils/app-info', [UtilityController::class, 'appInfo']);    
+Route::get('/utils/difficulties', [UtilityController::class, 'getDifficultyLevels']); 
+Route::get('/utils/search-suggestions', [UtilityController::class, 'searchSuggestions']); 
+Route::get('/utils/health-check', [UtilityController::class, 'healthCheck']);         
+Route::get('/utils/trending-tags', [UtilityController::class, 'trendingTags']);            
+Route::get('/utils/privacy', [UtilityController::class, 'privacyPolicy']);      
 /* ========================================================================
    2. USER ROUTES (Cần Token & Chịu ảnh hưởng bởi Bảo trì)
    ======================================================================== */

@@ -13,84 +13,94 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ShoppingListController;
+
 /*
 |--------------------------------------------------------------------------
-| API Routes - Hệ thống Bếp Việt 4.0
+| API ROUTES - BẾP VIỆT 4.0
 |--------------------------------------------------------------------------
 */
 
-// --- NHÓM 1: ROUTE CÔNG KHAI (Ai cũng xem được, không bị chặn bởi bảo trì) ---
+/* ========================================================================
+   1. PUBLIC ROUTES (Không cần đăng nhập)
+   ======================================================================== */
+
+// Authentication
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
+// Recipes & Categories
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']);
 Route::get('/recipes', [RecipeController::class, 'index']);
 Route::get('/recipes/search', [RecipeController::class, 'search']);
 Route::get('/recipes/{id}', [RecipeController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/categories/{id}/recipes', [RecipeController::class, 'getByCategory']);
 
+// Blog & Forum
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{id}', [PostController::class, 'show']);
 Route::get('/posts/{id}/comments', [CommentController::class, 'index']);
-Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
-// Ai cũng xem được
 Route::get('/forum', [ForumController::class, 'index']);
 Route::get('/forum/{id}', [ForumController::class, 'show']);
-// Route thêm nhiều món
-Route::post('shopping-list/bulk', [ShoppingListController::class, 'bulkStore']);
 
-// Route xem, xóa, sửa
-Route::resource('shopping-list', ShoppingListController::class);
-// --- NHÓM 2: ROUTE NGƯỜI DÙNG (Cần Token & Bị chặn khi bật Bảo trì) ---
-// Nhóm này áp dụng 'check.maintenance' để chặn User khi Admin đang sửa hệ thống
+// Reviews
+Route::get('/reviews/{recipeId}', [ReviewController::class, 'index']);
+
+
+/* ========================================================================
+   2. USER ROUTES (Cần Token & Chịu ảnh hưởng bởi Bảo trì)
+   ======================================================================== */
 Route::middleware(['auth:sanctum', 'check.maintenance'])->group(function () {
-    
-    // Thông tin cá nhân
+
+    // User Profile
     Route::get('/user', [AuthController::class, 'me']);
     Route::get('/user/profile', [UserController::class, 'getProfile']);
-    
-    // Tương tác bài viết (Thích, Bình luận, Đánh giá)
-    Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
-    Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::post('/comments', [CommentController::class, 'store']);
-    
-    // Quản lý bài viết cá nhân
+
+    // Shopping List
+    Route::post('shopping-list/bulk', [ShoppingListController::class, 'bulkStore']);
+    Route::resource('shopping-list', ShoppingListController::class);
+
+    // My Recipes (CRUD)
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::post('/recipes/{id}/update', [RecipeController::class, 'update']);
     Route::delete('/recipes/{id}', [RecipeController::class, 'destroy']);
     Route::patch('/recipes/{id}/trash', [RecipeController::class, 'moveToTrash']);
-    
-    // Quản lý Blog cá nhân
-    Route::post('/posts', [PostController::class, 'store']);
-    Route::post('/forum', [ForumController::class, 'store']);
-    Route::post('/forum/{id}/comment', [ForumController::class, 'reply']);
+    Route::post('/recipes/{id}/favorite', [RecipeController::class, 'toggleFavorite']);
+
+    // Community Interaction (Comment, Review, Forum)
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::post('/comments', [CommentController::class, 'store']);
+    Route::post('/posts', [PostController::class, 'store']); // Tạo bài blog cá nhân
+    Route::post('/forum', [ForumController::class, 'store']); // Tạo topic
+    Route::post('/forum/{id}/comment', [ForumController::class, 'reply']); // Trả lời topic
 });
 
 
-// --- NHÓM 3: ROUTE QUẢN TRỊ (Cần Token Admin & KHÔNG BỊ CHẶN khi bảo trì) ---
-// Admin cần vào được đây để Tắt/Bật chế độ bảo trì hoặc quản lý dữ liệu
+/* ========================================================================
+   3. ADMIN ROUTES (Cần Token Admin - Không bị chặn bởi Bảo trì)
+   ======================================================================== */
 Route::middleware(['auth:sanctum'])->group(function () {
-    
-    // Dashboard & Thống kê
+
+    // Dashboard
     Route::get('/admin/dashboard', [DashboardController::class, 'index']);
-    
-    // Quản lý Người dùng
+
+    // User Management
     Route::get('/admin/users', [UserController::class, 'index']);
     Route::put('/admin/users/{id}', [UserController::class, 'update']);
     Route::patch('/admin/users/{id}/status', [UserController::class, 'toggleStatus']);
     Route::delete('/admin/users/{id}', [UserController::class, 'destroy']);
-    
-    // Quản lý Công thức toàn hệ thống
+
+    // Recipe Management (Global)
     Route::get('/admin/recipes', [RecipeController::class, 'getAdminRecipes']);
     Route::patch('/admin/recipes/{id}/approve', [RecipeController::class, 'approve']);
     Route::patch('/admin/recipes/{id}/status', [RecipeController::class, 'toggleStatus']);
-    Route::delete('/admin/recipes/{id}', [RecipeController::class, 'destroy']); // Xóa vĩnh viễn
-    
-    // Cài đặt hệ thống (Duyệt bài, Bảo trì, Cấu hình kỹ thuật)
+    Route::delete('/admin/recipes/{id}', [RecipeController::class, 'destroy']);
+
+    // Category Management
+    Route::post('/admin/categories', [CategoryController::class, 'store']);
+    Route::put('/admin/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/admin/categories/{id}', [CategoryController::class, 'destroy']);
+
+    // System Settings
     Route::get('/admin/settings', [SettingController::class, 'getSettings']);
     Route::post('/admin/settings', [SettingController::class, 'updateSettings']);
-
-    Route::post('/admin/categories', [CategoryController::class, 'store']);
-    Route::put('/admin/categories/{id}', [CategoryController::class, 'update']); // Dùng POST + _method PUT cho ảnh
-    Route::delete('/admin/categories/{id}', [CategoryController::class, 'destroy']);
 });

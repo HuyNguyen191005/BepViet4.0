@@ -51,31 +51,27 @@ const Home = () => {
 
             {/* 3. DANH MỤC */}
             <div className="category-section">
-  {/* Sáng: Thay ☕ thành 🍳 (Trứng ốp la) hoặc 🥣 (Bát phở/cháo) sẽ đúng chất ăn sáng hơn */}
   <Link to="/an-sang" className="cat-item" style={{textDecoration: 'none', color:'inherit'}}>
     <div className="cat-icon" style={{color:'#22c55e'}}>🍳</div>
     <span>Sáng</span>
   </Link>
 
-  {/* Món chính: Thay 🥗 thành 🍛 (Cơm cà ri/thức ăn) hoặc 🍱 (Khay cơm) */}
   <Link to="/mon-chinh" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
     <div className="cat-icon" style={{color:'#22c55e'}}>🍛</div>
     <span>Món chính</span>
   </Link>
 
-  {/* Tráng miệng: Thay 🍲 thành 🍰 (Bánh ngọt) hoặc 🍮 (Caramen) */}
   <Link to="/trang-mieng" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
     <div className="cat-icon" style={{color:'#ef4444'}}>🍰</div>
     <span>Tráng miệng</span>
   </Link>
 
-  {/* Miền Bắc: Thay 🍰 thành 🍜 (Bát mì/phở - đặc trưng văn hóa ẩm thực Bắc) */}
+  
   <Link to="/mien-bac" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
     <div className="cat-icon" style={{color:'#f97316'}}>🍜</div>
     <span>Miền Bắc</span>
   </Link>
 
-  {/* Miền Nam: Thay 🍹 thành 🥥 (Quả dừa) hoặc 🥘 (Món kho/lẩu miền Nam) */}
   <Link to="/mien-nam" className="cat-item" style={{textDecoration: 'none', color: 'inherit'}}>
     <div className="cat-icon" style={{color:'#3b82f6'}}>🥥</div>
     <span>Miền Nam</span>

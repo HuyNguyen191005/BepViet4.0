@@ -67,7 +67,7 @@ export default function Header() {
                 {/* 2. MENU GIỮA */}
                 <nav className="header-center">
                     <Link to="/" className="nav-item active">Trang chủ</Link>
-                    <Link to="/recipes" className="nav-item">Công thức</Link>
+                    <Link to="/mon-chinh" className="nav-item">Công thức</Link>
                     <Link to="/forum" className="nav-item">Cộng đồng</Link>
                     <Link to="/blog" className="nav-item">Blog</Link>
                     <Link to="/shopping-list" className="nav-item" >Đi chợ</Link>
